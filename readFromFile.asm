@@ -1,3 +1,6 @@
+# this file is the function that grabs the info from the text files
+.text
+
 # preconditions:
 # 	$a0=file path
 #	$a1=buffer
