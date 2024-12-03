@@ -4,6 +4,8 @@
 .text
 .globl handle_weekday_transportation
 
+# preconditions: assumes that the $a, $t, $f registers have already been saved
+# postcondition: the total transportation emission for the weekday is stored in $f0
 # Handle weekday transportation input and calculations
 handle_weekday_transportation:
     addiu $sp, $sp, -8       # Allocate space on the stack

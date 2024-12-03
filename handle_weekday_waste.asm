@@ -1,6 +1,8 @@
 .text
 
 .globl handle_weekday_waste
+# preconditions: assumes that the $a, $t, $f registers have already been saved
+# postcondition: the total waste emission for the weekday is stored in $f0
 handle_weekday_waste:
 	addiu $sp, $sp, -8       # Allocate stack space
     	sw $ra, 4($sp)           # Save return address
