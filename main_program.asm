@@ -86,7 +86,7 @@ BLUE:	.word	0x000000FF
 lunch_question: 	.asciiz "How do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
 notes_question:		.asciiz "What do you use for notes? (1-Digital device, 2-Recycled paper, 3-Regular notebook): "
 waste_hours:		.asciiz "How many hours do you use your digital device?(0-24): "
-waste_pages:		.asciiz "How many pages do you use? (Enter a number starting from 0): "
+waste_pages:		.asciiz "How many pages do you use? (Enter a number greater or equal to 0): "
 waste_invalid_hours_msg: 	.asciiz "\nInvalid input! Please enter a value between 0 and 24."
 waste_invalid_pages_msg: 	.asciiz "\nInvalid input! Please enter a value greater than 0."
 
