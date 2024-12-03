@@ -1,8 +1,21 @@
 # Main file
 # contains all the data and the main function
 
+# Weekday waste
+.globl lunch_question
+.globl notes_question
+.globl waste_hours
+.globl waste_pages
+.globl waste_invalid_hours_msg
+.globl waste_invalid_pages_msg
 
-
+.globl ef_reusable
+.globl ef_aluminum 
+.globl ef_plastic 
+.globl ef_pre_packaged
+.globl ef_digital_device
+.globl ef_recycled_paper
+.globl ef_regular_notebook
 
 # weekday transportation
 .globl main_question
@@ -69,6 +82,14 @@ GREEN:	.word	0x0000FF00
 BLUE:	.word	0x000000FF
 
 
+# Prompts for weekday waste
+lunch_question: 	.asciiz "How do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
+notes_question:		.asciiz "What do you use for notes? (1-Digital device, 2-Recycled paper, 3-Regular notebook): "
+waste_hours:		.asciiz "How many hours do you use your digital device?(0-24): "
+waste_pages:		.asciiz "How many pages do you use? (Enter a number starting from 0): "
+waste_invalid_hours_msg: 	.asciiz "\nInvalid input! Please enter a value between 0 and 24."
+waste_invalid_pages_msg: 	.asciiz "\nInvalid input! Please enter a value greater than 0."
+
 # Prompts for weekday transportation
 main_question: .asciiz "\nDo you go to (1-School, 2-Work, 3-Both)? "
 transport_question: .asciiz "\nWhat do you take (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Personal Car, 5-Carpool)? "
@@ -96,6 +117,13 @@ ef_incandescent: .double 0.05  # Incandescent bulb (kg CO2 per hour)
 ef_heater: .double 1.5         # Heater (kg CO2 per hour)
 ef_blanket: .double 0.0        # Blanket (no emissions)
 
+ef_reusable: .double 0.03
+ef_aluminum: .double 0.01
+ef_plastic: .double 0.04
+ef_pre_packaged: .double 2.5
+ef_digital_device: .double 0.02 # per hour
+ef_recycled_paper: .double 0.01 # per page
+ef_regular_notebook: .double 0.05 # per page
 
 
 
@@ -159,6 +187,9 @@ main:
     
     # Display weekday energy emissions
     jal display_weekday_energy_emissions
+    
+    # Input weekly waste data and calculate
+    jal handle_weekday_waste
     
     # Exit program
     li $v0, 10

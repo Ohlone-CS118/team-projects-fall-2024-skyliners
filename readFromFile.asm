@@ -6,6 +6,8 @@
 #	$a1=buffer
 # postcondition: 
 #	the buffer address holds the file .text
+
+# need to set buffer and file path in main
 readFile:
 	
 	move $s0, $a0		# store file path
