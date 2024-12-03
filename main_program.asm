@@ -1,5 +1,9 @@
 # Main file
 # contains all the data and the main function
+
+
+
+
 # weekday transportation
 .globl main_question
 .globl transport_question
@@ -26,7 +30,45 @@
 .globl ef_heater
 .globl ef_blanket
 
-.data 
+
+
+.globl PIXEL_SIZE
+.globl WIDTH
+.globl HEIGHT
+.globl DISPLAY
+
+.globl GRAY
+.globl WHITE
+.globl RED
+.globl YELLOW
+.globl GREEN
+.globl BLUE
+
+.data
+  # set display to:
+#	Pixels width and height to 4x4
+#	Display width and height to 256x256
+#	Base address = 0x10000000
+# This will make our screen width 64x64 (256/4 = 64)
+# 64 * 64 * 4 = 16384 required bytes
+
+display:.space 16384
+
+# screen information
+PIXEL_SIZE:	.word  4
+WIDTH:	.word  64
+HEIGHT:	.word  64
+DISPLAY:.word  0x10000000
+
+# colors
+GRAY:	.word	0x00A0A0A0
+WHITE:	.word	0x00FFFFFF
+RED:	.word	0x00FF0000
+YELLOW:	.word	0x00FFFF00
+GREEN:	.word	0x0000FF00
+BLUE:	.word	0x000000FF
+
+
 # Prompts for weekday transportation
 main_question: .asciiz "\nDo you go to (1-School, 2-Work, 3-Both)? "
 transport_question: .asciiz "\nWhat do you take (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Personal Car, 5-Carpool)? "
@@ -54,74 +96,55 @@ ef_incandescent: .double 0.05  # Incandescent bulb (kg CO2 per hour)
 ef_heater: .double 1.5         # Heater (kg CO2 per hour)
 ef_blanket: .double 0.0        # Blanket (no emissions)
 
-# set display to:
-#	Pixels width and height to 4x4
-#	Display width and height to 256x256
-#	Base address = 0x10010000
-# This will make our screen width 64x64 (256/4 = 64)
-# 64 * 64 * 4 = 16384 required bytes
-
-display:	.space 16384
-
-define:
-# screen information
-	.eqv PIXEL_SIZE 4
-	.eqv WIDTH 64
-	.eqv HEIGHT 64
-	.eqv DISPLAY 0x10000000
-
-# colors
-	.eqv	GRAY 	0x00A0A0A0
-	.eqv	WHITE 	0x00FFFFFF
-	.eqv	RED	0x00FF0000
-	.eqv	YELLOW	0x00FFFF00
-	.eqv	GREEN	0x0000FF00
-	.eqv	BLUE	0x000000FF
 
 
-.text
+
 .globl main
+.text
+
+
 
 main:
 # set the frame pointer to the beginning of the stack
     move $fp, $sp       
     
+    	
     
-	li $a0, WHITE		# set white as the background color
+    
+	la $a0, WHITE		# set white as the background color
+	lw $a0, 0($a0)		
 	jal backgroundColor	# color the background
 	
 	
-	li $a0, 1		# set first bar starting x position to x = 1
-	li $a1, 10		# set first bar starting x position to x = 10
-	li $a2, 64		# set first bar height to 64
-	li $a3, GRAY		# set color to gray
+	li $a0, 3        # set first bar starting x position to x = 3
+	li $a1, 15        # set first bar starting x position to x = 15
+	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
 	jal drawBar		# draw bar
 
-	li $a0, 14		# set first bar starting x position to x = 14
-	li $a1, 23		# set first bar starting x position to x = 23
-	li $a2, 64		# set first bar height to 64
-	li $a3, GRAY		# set color to gray
+	li $a0, 18        # set second bar starting x position to x = 18
+    	li $a1, 30        # set second bar starting x position to x = 30
+    	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
 	jal drawBar		# draw bar
 	
 	
-	li $a0, 27		# set first bar starting x position to x = 27
-	li $a1, 36		# set first bar starting x position to x = 36
-	li $a2, 64		# set first bar height to 64
-	li $a3, GRAY		# set color to gray
+	li $a0, 33        # set third bar starting x position to x = 33
+ 	li $a1, 45        # set third bar starting x position to x = 45	li $a2, 64		# set first bar height to 64
+	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
 	jal drawBar		# draw bar
 	
-	li $a0, 40		# set first bar starting x position to x = 40
-	li $a1, 49		# set first bar starting x position to x = 49
-	li $a2, 64		# set first bar height to 64
-	li $a3, GRAY		# set color to gray
+	li $a0, 48        # set fourth bar starting x position to x = 48
+	li $a1, 60        # set fourth bar starting x position to x = 60
+	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
 	jal drawBar		# draw bar
 	
-	
-	li $a0, 53		# set first bar starting x position to x = 53
-	li $a1, 62		# set first bar starting x position to x = 62
-	li $a2, 64		# set first bar height to 64
-	li $a3, GRAY		# set color to gray
-	jal drawBar		# draw bar
 
 	
 	
@@ -146,14 +169,15 @@ display_weekday_transportation_emissions:
     addiu $sp, $sp, -4       # Allocate space on the stack
     sw $ra, 0($sp)           # Save return address
 
-# Example: Normalize emissions for a calculated $f0
+# Normalize emissions for calculated weekday transportation
 jal normalize_emission  # Normalize the emission value in $f0
 move $t4, $v0           # Save normalized height in $t3
 
-	li $a0, 1		# set first bar starting x position to x = 1
-	li $a1, 10		# set first bar starting x position to x = 10
-	move $a2, $t4		# set first bar height to 64
-	li $a3, GREEN		# set color to gray
+	li $a0, 3        # set first bar starting x position to x = 3
+ 	li $a1, 15        # set first bar starting x position to x = 15
+ 	move $a2, $t4        # set first bar height to normalized height
+    	la $a3, GREEN        # set color to green
+    	lw $a3, 0($a3)
 	jal drawBar		# draw bar
 
 
@@ -174,6 +198,20 @@ display_weekday_energy_emissions:
     addiu $sp, $sp, -4       # Allocate space on the stack
     sw $ra, 0($sp)           # Save return address
 
+
+# Normalize emissions for calculated weekday energy
+jal normalize_emission  # Normalize the emission value in $f0
+move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 18        # set second bar starting x position to x = 3
+ 	li $a1, 30        # set second bar starting x position to x = 15
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, YELLOW        # set color to yellow
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+
+
+
     li $v0, 4
     la $a0, weekday_energy_result
     syscall
@@ -191,129 +229,3 @@ display_weekday_energy_emissions:
 
 
 
-
-# draws the background color
-# precondition: $a0 is set the color
-backgroundColor:
-	
-	li $s1, DISPLAY		# The first pixel on the display
-		# set s2 = the last memory address of the display
-	li $s2, WIDTH
-	mul $s2, $s2, HEIGHT
-	mul $s2, $s2, 4		# word
-	add $s2, $s1, $s2
-
-backgroundLoop:
-	sw $a0, 0($s1)
-	addiu $s1, $s1, 4
-	ble $s1, $s2, backgroundLoop
-	
-	jr $ra
-
-
-
-# draws pixels
-# preconditions
-#	$a0 = x
-#	$a1 = y
-#	$a2 = color
-
-draw_pixel:
-	
-	addi $sp, $sp, -8		# make room on the stack for 2 words ($ra, $fp)
-	sw $fp, 4($sp)
-	addi $fp, $sp, 4	# move the $fp to the boginning of this stack frame
-	sw $ra, -4($fp)
-
-	# $s1 = address = DISPLAY + 4 * (x + (y * WIDTH))
-	mul $s1, $a1, WIDTH	# s1 = (y * WIDTH)
-	add $s1, $s1, $a0	# (x + s1)
-	mul $s1, $s1, 4		# word (4 bytes)
-	sw $a2, DISPLAY($s1)
-	
-
-	lw $ra, -4($fp)
-	lw $fp, 0($fp)
-	addi $sp, $sp, 8		# pop off the stack
-
-	jr $ra
-	
-
-
-
-
-# draws vertical bars
-# preconditions
-#	$a0 = x (starting)
-#	$a1 = x (ending)
-#	$a2 = height
-#	$a3 = color
-drawBar:
-	addi $sp, $sp, -8		# make room on the stack for 2 words ($ra, $fp)
-	sw $fp, 4($sp)		# store frame pointer
-	addi $fp, $sp, 4	# move the $fp to the beginning of this stack frame
-	sw $ra, -4($fp)		# store return address
-
-	li $s0, 65		# set y offset to bottom
-	move $s3, $a0		# The starting x position
-	move $s4, $a1		# The ending x position
-	sub $s5, $s0, $a2	# set s5 to height of bar
-	move $s6, $s3		# set s6 to reset s3 position
-
-	move $a2, $a3		# set color
-
-barLoopHorizontal:
-	bgt $s3, $s4, barLoop	# if s3 > s4
-	move $a0, $s3		# set x offset from s3
-	move $a1, $s0		# set y offset from s4
-	jal draw_pixel		# draw pixel
-	
-	addi $s3, $s3, 1	# move x one unit over
-	j barLoopHorizontal
-
-barLoop:
-	blt $s0, $s5, barExit	# if s0 < s5
-	move $s3, $s6		# The starting x position
-	subi $s0, $s0, 1	# move y one position up
-	j barLoopHorizontal
-barExit:	
-	lw $ra, -4($fp)			# restore return address
-	lw $fp, 0($fp)			# restore frame pointer
-	addi $sp, $sp, 8		# pop off the stack
-	
-	jr $ra
-
-
-
-# Normalize emissions to a height in the range 0-64
-# Preconditions:
-#   $f0 = emission value (in kg CO₂)
-# Postconditions:
-#   $v0 = normalized height (integer 0-64)
-normalize_emission:
-	addi $sp, $sp, -8		# make room on the stack for 2 words ($ra, $fp)
-	sw $fp, 4($sp)		# store frame pointer
-	addi $fp, $sp, 4	# move the $fp to the beginning of this stack frame
-	sw $ra, -4($fp)		# store return address
-
-
-
-    li $s0, 300            # Assume max emission is 45 kg CO2
-    mtc1 $s0, $f6          # Move 45 into $f6
-    cvt.d.w $f6, $f6       # Convert 45 to double
-
-    div.d $f8, $f0, $f6    # emission / 45 (normalize to 0-1)
-    li $s1, 64             # Max height (64 pixels)
-    mtc1 $s1, $f6          # Move 64 into $f6
-    cvt.d.w $f6, $f6       # Convert 64 to double
-    mul.d $f8, $f8, $f6    # emission_normalized * 64
-
-    cvt.w.d $f8, $f8       # Convert result to integer
-    mfc1 $v0, $f8          # Move result into $v0
-    
-    
-    	lw $ra, -4($fp)			# restore return address
-	lw $fp, 0($fp)			# restore frame pointer
-	addi $sp, $sp, 8		# pop off the stack
-    
-    jr $ra
