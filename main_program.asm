@@ -68,6 +68,8 @@
 .globl GREEN
 .globl BLUE
 
+.globl MAX_NORMALIZED_HEIGHT
+
 .data
   # set display to:
 #	Pixels width and height to 4x4
@@ -92,6 +94,7 @@ YELLOW:	.word	0x00FFFF00
 GREEN:	.word	0x0000FF00
 BLUE:	.word	0x000000FF
 
+MAX_NORMALIZED_HEIGHT: .double 1
 
 # Prompts for weekday waste
 lunch_question: 	.asciiz "How do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
@@ -200,21 +203,75 @@ main:
 	
     # Input weekday transportation data
     jal handle_weekday_transportation
-    mov.d $f26, $f0		# Store the weekday transportation in $f26 for a running total
+    
+    
+    # Normalize emissions for calculated weekday transportation
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t4
+
+	li $a0, 3        # set first bar starting x position to x = 3
+ 	li $a1, 15        # set first bar starting x position to x = 15
+ 	move $a2, $t4        # set first bar height to normalized height
+    	la $a3, GREEN        # set color to green
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
+    
+    mov.d $f24, $f0		# Store the weekday transportation in $f24 for a running total
 
     # Display weekday transportation emissions
     jal display_weekday_transportation_emissions
-    
+ 
+       mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
+           # Normalize total emissions for weekdays
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 48        # set foourth bar starting x position to x = 48
+ 	li $a1, 60        # set fourth bar starting x position to x = 60
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, BLUE        # set color to blue
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+	
+	
      # Input weekday energy data
     jal handle_weekday_energy
-    add.d $f26, $f26, $f0	# Store the weekday energy in $f26 for a running total
+    add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
     # Display weekday energy emissions
     jal display_weekday_energy_emissions
     
+       # Normalize emissions for calculated weekday energy
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 18        # set second bar starting x position to x = 18
+ 	li $a1, 30        # set second bar starting x position to x = 30
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, YELLOW        # set color to yellow
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
+    mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar  
+    
+           # Normalize total emissions for weekdays
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 48        # set foourth bar starting x position to x = 48
+ 	li $a1, 60        # set fourth bar starting x position to x = 60
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, BLUE        # set color to blue
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
     # Input weekly waste data and calculate
     jal handle_weekday_waste
-    add.d $f26, $f26, $f0	# Store the weekday waste in $f26 for a running total
+    add.d $f24, $f24, $f0	# Store the weekday waste in $f26 for a running total
     
     # Exit program
     li $v0, 10
@@ -225,16 +282,7 @@ display_weekday_transportation_emissions:
     addiu $sp, $sp, -4       # Allocate space on the stack
     sw $ra, 0($sp)           # Save return address
 
-# Normalize emissions for calculated weekday transportation
-jal normalize_emission  # Normalize the emission value in $f0
-move $t4, $v0           # Save normalized height in $t3
 
-	li $a0, 3        # set first bar starting x position to x = 3
- 	li $a1, 15        # set first bar starting x position to x = 15
- 	move $a2, $t4        # set first bar height to normalized height
-    	la $a3, GREEN        # set color to green
-    	lw $a3, 0($a3)
-	jal drawBar		# draw bar
 
 
     li $v0, 4
@@ -255,16 +303,7 @@ display_weekday_energy_emissions:
     sw $ra, 0($sp)           # Save return address
 
 
-# Normalize emissions for calculated weekday energy
-jal normalize_emission  # Normalize the emission value in $f0
-move $t4, $v0           # Save normalized height in $t3
 
-	li $a0, 18        # set second bar starting x position to x = 3
- 	li $a1, 30        # set second bar starting x position to x = 15
- 	move $a2, $t4        # set bar height to normalized height
-    	la $a3, YELLOW        # set color to yellow
-    	lw $a3, 0($a3)
-	jal drawBar		# draw bar
 
 
 

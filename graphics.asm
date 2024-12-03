@@ -126,13 +126,18 @@ normalize_emission:
 	addi $fp, $sp, 4	# move the $fp to the beginning of this stack frame
 	sw $ra, -4($fp)		# store return address
 
+	la $s2, MAX_NORMALIZED_HEIGHT # load max normalized value for height (1)
+	l.d $f26, 0($s2)	# load 1 as max value into $f26
 
-
-    li $s0, 300            # Assume max emission is 45 kg CO2
+    li $s0, 300            # Assume max emission is 300 kg CO2
     mtc1 $s0, $f30          # Move 300 into $f30
     cvt.d.w $f30, $f30       # Convert 300 to double
 
     div.d $f28, $f0, $f30    # emission / 300 (normalize to 0-1)
+    c.lt.d $f26, $f28	# if normalized value > 1
+    bc1t normalize_emission_overflow # branch if true
+    
+normalize_emission_resume:    
     la $s1, HEIGHT
     lw $s1, 0($s1)             # Max height (64 pixels) 
     mtc1 $s1, $f30          # Move max height into $f30
@@ -141,6 +146,7 @@ normalize_emission:
 
     cvt.w.d $f28, $f28       # Convert result to integer
     mfc1 $v0, $f28          # Move result into $v0
+
     
     
     	lw $ra, -4($fp)			# restore return address
@@ -148,3 +154,8 @@ normalize_emission:
 	addi $sp, $sp, 8		# pop off the stack
     
     jr $ra
+
+    
+normalize_emission_overflow:
+	mov.d $f28, $f26 # set the value 1 in f28
+	j normalize_emission_resume
