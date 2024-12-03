@@ -315,8 +315,7 @@ main:
     
     
     
-    
-    
+   
     
     # Input weekend energy data
     jal handle_weekend_energy
@@ -326,9 +325,16 @@ main:
     jal handle_weekend_transportation
     add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
+
+    
+        
     # Exit program
     li $v0, 10
     syscall
+
+
+
+
 
 # Display the weekday transportation emissions
 display_weekday_transportation_emissions:
