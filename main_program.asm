@@ -178,18 +178,21 @@ main:
 	
     # Input weekday transportation data
     jal handle_weekday_transportation
+    mov.d $f30, $f0		# Store the weekday transportation in $f30 for a running total
 
     # Display weekday transportation emissions
     jal display_weekday_transportation_emissions
     
      # Input weekday energy data
     jal handle_weekday_energy
+    add.d $f30, $f30, $f0	# Store the weekday energy in $f30 for a running total
     
     # Display weekday energy emissions
     jal display_weekday_energy_emissions
     
     # Input weekly waste data and calculate
     jal handle_weekday_waste
+    add.d $f30, $f30, $f0	# Store the weekday waste in $f30 for a running total
     
     # Exit program
     li $v0, 10
