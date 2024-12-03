@@ -43,6 +43,17 @@
 .globl ef_heater
 .globl ef_blanket
 
+#weekday energy
+.globl weekend_energy_main_question
+.globl weekend_energy_hours_question
+.globl weekend_energy_invalid_hours_msg
+.globl weekend_energy_baking_minutes
+.globl weekend_enegry_invalid_minutes_msg
+
+.globl ef_movie
+.globl ef_gaming
+.globl ef_baking
+
 
 
 .globl PIXEL_SIZE
@@ -106,6 +117,13 @@ heater_or_blanket_question: .asciiz "\nDo you use a heater or just a blanket? (1
 heater_hours_question: .asciiz "\nHow many hours do you use the heater daily? (0-24): "
 weekday_energy_result: .asciiz "\nYour weekday energy emissions (kg CO2): "
 
+# Prompts for weekday energy
+weekend_energy_main_question:	.asciiz "Do you spend your weekend (1-Watching Movies on the TV, 2-Gaming on the TV, or 3-Baking)? "
+weekend_energy_hours_question:	.asciiz "How many hours? (0-24): "
+weekend_energy_invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 24."
+weekend_energy_baking_minutes:	.asciiz "How many minutes does the item that you're baking take? (Enter a number starting from 0): "
+weekend_enegry_invalid_minutes_msg: .asciiz "\nInvalid input! Please enter a value greater or equal to 0."
+
 # Emission factors (double-precision)
 ef_bus: .double 0.1            # Public transit (kg CO2 per mile)
 ef_car: .double 0.3            # Personal car (kg CO2 per mile)
@@ -124,6 +142,10 @@ ef_pre_packaged: .double 2.5
 ef_digital_device: .double 0.02 # per hour
 ef_recycled_paper: .double 0.01 # per page
 ef_regular_notebook: .double 0.05 # per page
+
+ef_movie: .double 0.08          # Watching movies on the TV (kg CO2 per hour)
+ef_gaming: .double 0.16  	# Gaming on the TV (kg CO2 per hour)(emission from TV + from gaming system(0.08))
+ef_baking: .double 0.02        	# Baking (kg CO2 per minute)
 
 
 
