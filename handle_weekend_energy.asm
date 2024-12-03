@@ -1,6 +1,5 @@
 .text
-.globl handle_weekday_energy
-
+.globl handle_weekend_energy
 # preconditions: assumes that the $a, $t, $f registers have already been saved
 # postcondition: the total energy emission for the weekday is stored in $f0
 # Handle weekend energy input and calculations
@@ -100,21 +99,4 @@ end_weekend_energy:
     	lw $t0, 0($sp)              # Restore $t0
     	addiu $sp, $sp, 8           # Deallocate stack space
     	jr $ra                      # Return to main
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-
+ 
