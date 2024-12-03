@@ -72,6 +72,7 @@
 .globl YELLOW
 .globl GREEN
 .globl BLUE
+.globl BLACK
 
 .globl MAX_NORMALIZED_HEIGHT
 
@@ -98,6 +99,7 @@ RED:	.word	0x00FF0000
 YELLOW:	.word	0x00FFFF00
 GREEN:	.word	0x0000FF00
 BLUE:	.word	0x000000FF
+BLACK:	.word	0x00000000
 
 MAX_NORMALIZED_HEIGHT: .double 1
 
@@ -282,6 +284,39 @@ main:
     # Input weekly waste data and calculate
     jal handle_weekday_waste
     add.d $f24, $f24, $f0	# Store the weekday waste in $f26 for a running total
+    
+    
+    
+
+       # Normalize emissions for calculated weekday waste
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t4
+
+	li $a0, 33        # set second bar starting x position to x = 33
+ 	li $a1, 45        # set second bar starting x position to x = 45
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, BLACK        # set color to yellow
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
+    mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar  
+    
+           # Normalize total emissions for weekdays
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 48        # set foourth bar starting x position to x = 48
+ 	li $a1, 60        # set fourth bar starting x position to x = 60
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, BLUE        # set color to blue
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
+    
+    
+    
     
     # Input weekend energy data
     jal handle_weekend_energy
