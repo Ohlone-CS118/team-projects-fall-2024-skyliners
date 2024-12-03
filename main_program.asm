@@ -102,6 +102,7 @@ BLUE:	.word	0x000000FF
 BLACK:	.word	0x00000000
 
 MAX_NORMALIZED_HEIGHT: .double 1
+ZERO_DOUBLE: .double 0
 
 # Prompts for weekday waste
 lunch_question: 	.asciiz "How do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
@@ -126,6 +127,9 @@ invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 
 heater_or_blanket_question: .asciiz "\nDo you use a heater or just a blanket? (1-Heater, 2-Blanket): "
 heater_hours_question: .asciiz "\nHow many hours do you use the heater daily? (0-24): "
 weekday_energy_result: .asciiz "\nYour weekday energy emissions (kg CO2): "
+
+# Lets user know bar graphs are resetting
+reset_bar_graphs_message:	.asciiz "\nNow resetting bar graphs to display the weekend data. Clearing them in 5 seconds.\n"
 
 # Prompts for weekend energy
 weekend_energy_main_question:	.asciiz "Do you spend your weekend (1-Watching Movies on the TV, 2-Gaming on the TV, or 3-Baking)? "
@@ -197,7 +201,7 @@ main:
 	
 	
 	li $a0, 33        # set third bar starting x position to x = 33
- 	li $a1, 45        # set third bar starting x position to x = 45	li $a2, 64		# set first bar height to 64
+ 	li $a1, 45        # set third bar starting x position to x = 45		
 	li $a2, 64		# set bar height to 64
 	la $a3, GRAY		# set color to gray
 	lw $a3, 0($a3)
@@ -315,17 +319,122 @@ main:
     
     
     
+    li $v0, 4
+    la $a0, reset_bar_graphs_message	# display reset bars message
+    syscall
+    
+    li $v0, 32
+    la $a0, 5000	# sleep for 5 seconds
+    syscall
+    
+    
+    
+    
+    # reset bars
+    	li $a0, 3        # set first bar starting x position to x = 3
+	li $a1, 15        # set first bar starting x position to x = 15
+	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+
+	li $a0, 18        # set second bar starting x position to x = 18
+    	li $a1, 30        # set second bar starting x position to x = 30
+    	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+	
+	
+	li $a0, 33        # set third bar starting x position to x = 33
+ 	li $a1, 45        # set third bar starting x position to x = 45		
+	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+	
+	li $a0, 48        # set fourth bar starting x position to x = 48
+	li $a1, 60        # set fourth bar starting x position to x = 60
+	li $a2, 64		# set bar height to 64
+	la $a3, GRAY		# set color to gray
+	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+	
+    
+    mov.d $f22, $f24	# move current total to $f22 to save and then reset total to get total for weekend
+    
+    la $t0, ZERO_DOUBLE	
+    ldc1 $f24, 0($t0)	# load zero into f24
    
     
     # Input weekend energy data
     jal handle_weekend_energy
     add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
+    
+    
+        
+    # Normalize emissions for calculated weekend energy
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t4
+
+	li $a0, 3        # set first bar starting x position to x = 3
+ 	li $a1, 15        # set first bar starting x position to x = 15
+ 	move $a2, $t4        # set first bar height to normalized height
+    	la $a3, YELLOW        # set color to yellow
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
+    
+           mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
+           # Normalize total emissions for weekends
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 48        # set foourth bar starting x position to x = 48
+ 	li $a1, 60        # set fourth bar starting x position to x = 60
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, BLUE        # set color to blue
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
+    
     # Input weekend transportation data
     jal handle_weekend_transportation
     add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
 
+    
+    
+    
+      # Normalize emissions for calculated weekend  tranportation
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 18        # set second bar starting x position to x = 18
+ 	li $a1, 30        # set second bar starting x position to x = 30
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, GREEN        # set color to green
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
+    mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar  
+    
+           # Normalize total emissions for weekends
+	jal normalize_emission  # Normalize the emission value in $f0
+	move $t4, $v0           # Save normalized height in $t3
+
+	li $a0, 48        # set foourth bar starting x position to x = 48
+ 	li $a1, 60        # set fourth bar starting x position to x = 60
+ 	move $a2, $t4        # set bar height to normalized height
+    	la $a3, BLUE        # set color to blue
+    	lw $a3, 0($a3)
+	jal drawBar		# draw bar
+    
+    
     
         
     # Exit program
