@@ -43,7 +43,7 @@
 .globl ef_heater
 .globl ef_blanket
 
-#weekday energy
+#weekend energy
 .globl weekend_energy_main_question
 .globl weekend_energy_hours_question
 .globl weekend_energy_invalid_hours_msg
@@ -53,6 +53,11 @@
 .globl ef_movie
 .globl ef_gaming
 .globl ef_baking
+
+#weekend transportation. the emission factors are the same as weekday
+.globl weekend_transportation_main_question
+.globl weekend_miles_question
+.globl weekend_carpool_question
 
 
 
@@ -120,12 +125,17 @@ heater_or_blanket_question: .asciiz "\nDo you use a heater or just a blanket? (1
 heater_hours_question: .asciiz "\nHow many hours do you use the heater daily? (0-24): "
 weekday_energy_result: .asciiz "\nYour weekday energy emissions (kg CO2): "
 
-# Prompts for weekday energy
+# Prompts for weekend energy
 weekend_energy_main_question:	.asciiz "Do you spend your weekend (1-Watching Movies on the TV, 2-Gaming on the TV, or 3-Baking)? "
 weekend_energy_hours_question:	.asciiz "How many hours? (0-24): "
 weekend_energy_invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 24."
 weekend_energy_baking_minutes:	.asciiz "How many minutes does the item that you're baking take? (Enter a number starting from 0): "
 weekend_enegry_invalid_minutes_msg: .asciiz "\nInvalid input! Please enter a value greater or equal to 0."
+
+# Prompts for weekend transport
+weekend_transportation_main_question:	.asciiz "How do you travel to leisure activities? (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Car, 5-Carpool)"
+weekend_miles_question:	.asciiz "\nHow many miles do you travel daily? "
+weekend_carpool_question: 	.asciiz "\nIf carpool, how many people (including yourself)? "
 
 # Emission factors (double-precision)
 ef_bus: .double 0.1            # Public transit (kg CO2 per mile)
@@ -272,6 +282,14 @@ main:
     # Input weekly waste data and calculate
     jal handle_weekday_waste
     add.d $f24, $f24, $f0	# Store the weekday waste in $f26 for a running total
+    
+    # Input weekend energy data
+    jal handle_weekend_energy
+    add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
+    
+    # Input weekend transportation data
+    jal handle_weekend_transportation
+    add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
     # Exit program
     li $v0, 10
