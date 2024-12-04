@@ -12,6 +12,7 @@ handle_weekday_energy:
     sw $ra, 4($sp)           # Save return address
     sw $t0, 0($sp)           # Save temporary register $t0
 
+solar_label:
     # Question 1: Solar Panels
     li $v0, 4
     la $a0, solar_question
@@ -20,7 +21,11 @@ handle_weekday_energy:
     li $v0, 5
     syscall
     move $t0, $v0            # Save solar panel choice
+    
+    blt $t0, 1, invalid_solar
+    bgt $t0, 2, invalid_solar
 
+light_bulb_label:
     # Question 2: Light Bulb Type
     li $v0, 4
     la $a0, bulb_question
@@ -29,7 +34,10 @@ handle_weekday_energy:
     li $v0, 5
     syscall
     move $t1, $v0            # Save light bulb type
-
+    
+    blt $t1, 1, invalid_light
+    bgt $t1, 2, invalid_light
+    
     # Question 3: Light Usage Hours (Allow 0-24)
 light_hours_prompt:
     li $v0, 4
@@ -50,6 +58,8 @@ invalid_hours:
     j light_hours_prompt        # Retry the question
 
 valid_hours:
+
+heater_label:
     # Question 4: Heater or Blanket
     li $v0, 4
     la $a0, heater_or_blanket_question
@@ -58,6 +68,9 @@ valid_hours:
     li $v0, 5
     syscall
     move $t3, $v0               # Save heating choice
+    
+    blt $t3, 1, invalid_heater
+    bgt $t3, 2, invalid_heater
 
     # Calculate Light Bulb Emissions
     beq $t1, 1, use_led         # If LED
@@ -87,6 +100,30 @@ use_heater:
 use_blanket:
     l.d $f8, ef_blanket         # Load blanket emission factor (0 emissions)
     j sum_energy_emissions
+
+invalid_solar:
+# If user inputs something other than one of the choices
+	li $v0, 4
+    	la $a0, invalid_user_input
+    	syscall
+    	
+    	j solar_label
+
+invalid_light:
+# If user inputs something other than one of the choices
+	li $v0, 4
+    	la $a0, invalid_user_input
+    	syscall
+    	
+    	j light_bulb_label
+
+invalid_heater:
+# If user inputs something other than one of the choices
+	li $v0, 4
+    	la $a0, invalid_user_input
+    	syscall
+    	
+    	j heater_label
 
 sum_energy_emissions:
     add.d $f10, $f6, $f8        # Total energy emissions = light + heater/blanket
