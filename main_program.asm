@@ -35,6 +35,10 @@
 .globl miles_question
 .globl carpool_question
 .globl weekday_transportation_result
+.globl main_question_invalid_msg
+.globl transport_question_invalid_msg
+.globl miles_question_invalid_msg
+.globl carpool_question_invalid_msg
 
 .globl ef_bus
 .globl ef_car
@@ -160,9 +164,13 @@ weekday_waste_result:		.asciiz "\nYour weekday waste emissions represented by bl
 
 # Prompts for weekday transportation
 main_question: .asciiz "\n\nDo you go to (1-School, 2-Work, 3-Both)? "
+main_question_invalid_msg: .asciiz "\nInvalid input! Please enter a value between 1 and 3."
 transport_question: .asciiz "\nWhat do you take (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Personal Car, 5-Carpool)? "
+transport_question_invalid_msg: .asciiz "\nInvalid input! Please enter a value between 1 and 5."
 miles_question: .asciiz "\nHow many miles do you travel daily? "
 carpool_question: .asciiz "\nIf carpool, how many people (including yourself)? "
+miles_question_invalid_msg: .asciiz "\nInvalid input! Please enter a value greater than 0."
+carpool_question_invalid_msg: .asciiz "\nInvalid input! Please enter a value greater than 1."
 weekday_transportation_result: .asciiz "\nYour weekday transportation emissions represented by green (kg CO2): "
 
 # Prompts for weekday energy
@@ -249,14 +257,14 @@ ef_recycled: .double -1.0
 ef_non_recycled: .double 2.0
 
 # Text files. Different paths for ech person
-energy1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
-energy2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
-transport1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
-transport2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
-waste1:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
-waste2:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
-warning:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/warning.txt"
-feedback:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/feedback.txt"
+energy1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
+energy2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
+transport1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
+transport2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
+waste1:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
+waste2:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
+warning:	.asciiz "./team-projects-fall-2024-skyliners/text_files/warning.txt"
+feedback:	.asciiz "./team-projects-fall-2024-skyliners/text_files/feedback.txt"
 buffer:		.space 1024 
 
 # Comments based on projection compared to average
@@ -1009,6 +1017,9 @@ display_weekend_waste_emissions:
     	addiu $sp, $sp, 4        # Deallocate stack space
     	jr $ra                   # Returning control to main
  
+ 
+ 
+ 
 # Celebratory sound
 # $a0 and $v0 should be available       
 celebratory:  
@@ -1016,35 +1027,35 @@ celebratory:
       	li $v0, 33  
       	syscall 
 	
-      	li $a0, 523    # C5  
+      	li $a0, 72    # C5  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
 
-      	li $a0, 587    # D5  
+      	li $a0, 74    # D5  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 659    # E5  
+      	li $a0, 76    # E5  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 698    # F5  
+      	li $a0, 77    # F5  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 784    # G5  
+      	li $a0, 79    # G5  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
@@ -1060,35 +1071,35 @@ less_celebratory:
       	li $v0, 33  
       	syscall 
       	
-      	li $a0, 392    # G4  
+      	li $a0, 67    # G4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 440    # A4  
+      	li $a0, 69    # A4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 493    # B4  
+      	li $a0, 71    # B4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 523    # C5  
+      	li $a0, 72    # C5  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 587    # D5  
+      	li $a0, 74    # D5  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
@@ -1104,35 +1115,35 @@ bad:
       	li $v0, 33  
       	syscall 
       	
-      	li $a0, 261    # C4  
+      	li $a0, 60    # C4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 294    # D4  
+      	li $a0, 62    # D4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 329    # E4  
+      	li $a0, 64    # E4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 349    # F4  
+      	li $a0, 65    # F4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
       	li $v0, 32  
       	syscall  
   
-      	li $a0, 392    # G4  
+      	li $a0, 67    # G4  
       	li $v0, 31  
       	syscall  
       	li $a0, 500    # 500 milliseconds  
