@@ -7,7 +7,8 @@ handle_weekend_transportation:
     	addiu $sp, $sp, -8       # Allocate space on the stack
     	sw $ra, 4($sp)           # Save return address to main
     	sw $t0, 0($sp)           # Save temporary register $t0
-    
+    	
+ask_weekend_transportation_main_question:
     	li $v0, 4
     	la $a0, weekend_transportation_main_question
     	syscall
@@ -15,16 +16,24 @@ handle_weekend_transportation:
     	li $v0, 5
     	syscall
     	move $t1, $v0		# Store the transport method
-
+	
+	beq $t1, 1, no_emission    	 # If walk
+	beq $t1, 2, no_emission    	 # If bike
     	beq $t1, 3, weekend_ask_miles    # If Bus/Public Transit
     	beq $t1, 4, weekend_ask_miles    # If Personal Car
     	beq $t1, 5, weekend_ask_miles    # If Carpool
-
-    	l.d $f0, zero_value      # Non-motorized emissions (default to 0)
     
-    	j end_weekend_transportation
+    	# If user inputs something other than one of the choices
+	li $v0, 4
+    	la $a0, invalid_user_input
+    	syscall
+    	
+    	j ask_weekend_transportation_main_question
  
-  
+no_emission: 
+   	l.d $f0, zero_value      # Non-motorized emissions (default to 0)
+   	j end_weekend_transportation
+   	
 weekend_ask_miles: 
 	li $v0, 4
     	la $a0, weekend_miles_question
