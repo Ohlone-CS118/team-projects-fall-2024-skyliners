@@ -1,6 +1,16 @@
 # Main file
 # contains all the data and the main function
 
+# Text files
+.globl energy1
+.globl energy2
+.globl transport1
+.globl transport2
+.globl waste1
+.globl waste2
+.globl warning
+.globl buffer
+
 # Weekday waste
 .globl lunch_question
 .globl notes_question
@@ -147,7 +157,7 @@ waste_invalid_pages_msg: 	.asciiz "\nInvalid input! Please enter a value greater
 weekday_waste_result:		.asciiz "\nYour weekday waste emissions represented by black (kg CO2): "
 
 # Prompts for weekday transportation
-main_question: .asciiz "\nDo you go to (1-School, 2-Work, 3-Both)? "
+main_question: .asciiz "\n\nDo you go to (1-School, 2-Work, 3-Both)? "
 transport_question: .asciiz "\nWhat do you take (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Personal Car, 5-Carpool)? "
 miles_question: .asciiz "\nHow many miles do you travel daily? "
 carpool_question: .asciiz "\nIf carpool, how many people (including yourself)? "
@@ -166,7 +176,7 @@ weekday_energy_result: .asciiz "\nYour weekday energy emissions represented by y
 reset_bar_graphs_message:	.asciiz "\n\nNow resetting bar graphs to display new data. Clearing them in 5 seconds...\n"
 
 # Prompts for weekend energy
-weekend_energy_main_question:	.asciiz "\nDo you spend your weekend (1-Watching Movies on the TV, 2-Gaming on the TV, or 3-Baking)? "
+weekend_energy_main_question:	.asciiz "\n\nDo you spend your weekend (1-Watching Movies on the TV, 2-Gaming on the TV, or 3-Baking)? "
 weekend_energy_hours_question:	.asciiz "\nHow many hours? (0-24): "
 weekend_energy_invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 24."
 weekend_energy_baking_minutes:	.asciiz "\nHow many minutes does the item that you're baking take? (Enter a number starting from 0): "
@@ -236,6 +246,15 @@ ef_packaging_waste_significant: .double 6.0
 ef_recycled: .double -1.0
 ef_non_recycled: .double 2.0
 
+# Text files. Different paths for ech person
+energy1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
+energy2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
+transport1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
+transport2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
+waste1:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
+waste2:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
+warning:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/warning.txt"
+buffer:		.space 1024 
 
 .globl main
 .text
@@ -287,7 +306,21 @@ main:
 	
 	
     # Input weekday transportation data
-    jal handle_weekday_transportation
+    	move $t6, $a0		# Save value in $a0
+    	move $t7, $a1		# Save value in $a1
+    
+    	la $a0, transport1		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	move $a0, $t6		# Reset $a0
+	move $a1, $t7		# Reset $a1
+	
+    	jal handle_weekday_transportation
     
     
     # Normalize emissions for calculated weekday transportation
@@ -330,11 +363,33 @@ main:
     	syscall
 	
      # Input weekday energy data
-    jal handle_weekday_energy
-    add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
+     	move $t6, $a0		# Save value in $a0
+    	move $t7, $a1		# Save value in $a1
+    	
+    	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+	
+	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+    
+    	la $a0, energy1		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	move $a0, $t6		# Reset $a0
+	move $a1, $t7		# Reset $a1
+	
+    	jal handle_weekday_energy
+    	add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
     # Display weekday energy emissions
-    jal display_weekday_energy_emissions
+    	jal display_weekday_energy_emissions
     
        # Normalize emissions for calculated weekday energy
 	jal normalize_emission_weekday  # Normalize the emission value in $f0
@@ -372,8 +427,30 @@ main:
     	syscall
     
     # Input weekly waste data and calculate
-    jal handle_weekday_waste
-    add.d $f24, $f24, $f0	# Store the weekday waste in $f26 for a running total
+    	move $t6, $a0		# Save value in $a0
+    	move $t7, $a1		# Save value in $a1
+    	
+    	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+	
+	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+    
+    	la $a0, waste1		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	move $a0, $t6		# Reset $a0
+	move $a1, $t7		# Reset $a1
+    
+   	jal handle_weekday_waste
+   	add.d $f24, $f24, $f0	# Store the weekday waste in $f26 for a running total
     
     
     
@@ -463,6 +540,23 @@ main:
    
     
     # Input weekend energy data
+    	move $t6, $a0		# Save value in $a0
+    	move $t7, $a1		# Save value in $a1
+    	
+    	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+    
+    	la $a0, energy2		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	move $a0, $t6		# Reset $a0
+	move $a1, $t7		# Reset $a1
     jal handle_weekend_energy
     add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
@@ -506,8 +600,30 @@ main:
     
     
     # Input weekend transportation data
-    jal handle_weekend_transportation
-    add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
+    	move $t6, $a0		# Save value in $a0
+    	move $t7, $a1		# Save value in $a1
+    	
+    	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+	
+	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+    
+    	la $a0, transport2		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	move $a0, $t6		# Reset $a0
+	move $a1, $t7		# Reset $a1
+    
+    	jal handle_weekend_transportation
+    	add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
 
     
@@ -549,8 +665,31 @@ main:
 
 
 # Input weekend waste data
-    jal handle_weekend_waste
-    add.d $f24, $f24, $f0	# Store the weekend energy in $f24 for a running total
+
+	move $t6, $a0		# Save value in $a0
+    	move $t7, $a1		# Save value in $a1
+    
+    	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+	
+	li $v0, 11		# Newline to seperate the fact from the prompts
+	la $a0, 10
+	syscall
+    
+    	la $a0, waste2		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	move $a0, $t6		# Reset $a0
+	move $a1, $t7		# Reset $a1
+	
+    	jal handle_weekend_waste
+    	add.d $f24, $f24, $f0	# Store the weekend energy in $f24 for a running total
 # Display weekend transportation emissions
     jal display_weekend_waste_emissions
 

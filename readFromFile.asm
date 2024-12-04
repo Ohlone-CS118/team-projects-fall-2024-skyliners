@@ -1,6 +1,6 @@
 # this file is the function that grabs the info from the text files
 .text
-
+.globl readFromFile
 # preconditions:
 # 	$a0=file path
 #	$a1=buffer
@@ -8,7 +8,7 @@
 #	the buffer address holds the file .text
 
 # need to set buffer and file path in main
-readFile:
+readFromFile:
 	
 	move $s0, $a0		# store file path
 	move $s1, $a1		# store buffer
@@ -24,7 +24,7 @@ readFile:
 	li $v0, 14		# read the file
 	move $a0, $s3		# set file handler
 	move $a1, $s1		# set the buffer
-	li $a2, 199		# set max length and leave space for null
+	li $a2, 1024		# set max length and leave space for null
 	syscall
 	
 	move $s4, $v0		# save the number of char read
