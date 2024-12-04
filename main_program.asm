@@ -144,14 +144,14 @@ waste_hours:		.asciiz "\nHow many hours do you use your digital device?(0-24): "
 waste_pages:		.asciiz "\nHow many pages do you use? (Enter a number greater or equal to 0): "
 waste_invalid_hours_msg: 	.asciiz "\nInvalid input! Please enter a value between 0 and 24."
 waste_invalid_pages_msg: 	.asciiz "\nInvalid input! Please enter a value greater than 0."
-weekday_waste_result:		.asciiz "\nYour weekday waste emissions (kg CO2): "
+weekday_waste_result:		.asciiz "\nYour weekday waste emissions represented by black (kg CO2): "
 
 # Prompts for weekday transportation
 main_question: .asciiz "\nDo you go to (1-School, 2-Work, 3-Both)? "
 transport_question: .asciiz "\nWhat do you take (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Personal Car, 5-Carpool)? "
 miles_question: .asciiz "\nHow many miles do you travel daily? "
 carpool_question: .asciiz "\nIf carpool, how many people (including yourself)? "
-weekday_transportation_result: .asciiz "\nYour weekday transportation emissions (kg CO2): "
+weekday_transportation_result: .asciiz "\nYour weekday transportation emissions represented by green (kg CO2): "
 
 # Prompts for weekday energy
 solar_question: .asciiz "\n\nDo you have solar panels installed? (1-Yes, 2-No): "
@@ -160,7 +160,7 @@ light_hours_question: .asciiz "\nHow many hours do you leave your lights on dail
 invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 24."
 heater_or_blanket_question: .asciiz "\nDo you use a heater or just a blanket? (1-Heater, 2-Blanket): "
 heater_hours_question: .asciiz "\nHow many hours do you use the heater daily? (0-24): "
-weekday_energy_result: .asciiz "\nYour weekday energy emissions (kg CO2): "
+weekday_energy_result: .asciiz "\nYour weekday energy emissions represented by yellow (kg CO2): "
 
 # Lets user know bar graphs are resetting
 reset_bar_graphs_message:	.asciiz "\n\nNow resetting bar graphs to display new data. Clearing them in 5 seconds...\n"
@@ -171,13 +171,13 @@ weekend_energy_hours_question:	.asciiz "\nHow many hours? (0-24): "
 weekend_energy_invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 24."
 weekend_energy_baking_minutes:	.asciiz "\nHow many minutes does the item that you're baking take? (Enter a number starting from 0): "
 weekend_enegry_invalid_minutes_msg: .asciiz "\nInvalid input! Please enter a value greater or equal to 0."
-weekend_energy_result: .asciiz "\nYour weekend energy emissions (kg CO2): "
+weekend_energy_result: .asciiz "\nYour weekend energy emissions represented by yellow (kg CO2): "
 
 # Prompts for weekend transport
 weekend_transportation_main_question:	.asciiz "\n\nHow do you travel to leisure activities? (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Car, 5-Carpool)"
 weekend_miles_question:	.asciiz "\nHow many miles do you travel daily? "
 weekend_carpool_question: 	.asciiz "\nIf carpool, how many people (including yourself)? "
-weekend_transportation_result: .asciiz "\nYour weekend transportation emissions (kg CO2): "
+weekend_transportation_result: .asciiz "\nYour weekend transportation emissions represented by green (kg CO2): "
 
 # Prompts for weekend waste
 bag_question: .asciiz "\n\nWhat kind of bags do you use for groceries? (1: Reusable tote, 2: Paper bag, 3: Plastic bag): "
@@ -188,7 +188,14 @@ personal_waste_question: .asciiz "\nDid you separate your recyclable waste? (1: 
 result_msg: .asciiz "\nYour total weekend CO₂ emissions are: "
 newline: .asciiz "\n"
 invalid_input: .asciiz "\nInvalid input! Please try again.\n"
-weekend_waste_result: .asciiz "\nYour weekend waste emissions (kg CO2): "
+weekend_waste_result: .asciiz "\nYour weekend waste emissions represented by black (kg CO2): "
+
+# Prompts for total CO2
+weekday_total_result:	.asciiz "\nYour weekday total emissions represented by blue (kg CO2) is now: "
+weekend_total_result:	.asciiz "\nYour weekend total emissions represented by blue (kg CO2) is now: "
+week_total_result:	.asciiz "\nYour week total emissions (kg CO2): "
+yearly_projection_result:	.asciiz "\nYour yearly projected emissions represented by blue (kg CO2): "
+average_american_result:	.asciiz "\nThis is compared to the average American yearly emission represented in purple which is 16 tons (16000 kg CO2)"
 
 # Emission factors (double-precision)
 ef_bus: .double 0.1            # Public transit (kg CO2 per mile)
@@ -314,6 +321,14 @@ main:
 	jal drawBar		# draw bar
 	
 	
+	li $v0, 4
+        la $a0, weekday_total_result	# load weekday total result string
+        syscall
+    
+    	li $v0, 3
+    	mov.d $f12, $f24	# load weekday total result double
+    	syscall
+	
      # Input weekday energy data
     jal handle_weekday_energy
     add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
@@ -347,6 +362,15 @@ main:
 	jal drawBar		# draw bar
     
     
+    # display running total
+    	li $v0, 4
+        la $a0, weekday_total_result	# load weekday total result string
+        syscall
+    
+    	li $v0, 3
+    	mov.d $f12, $f24	# load weekday total result double
+    	syscall
+    
     # Input weekly waste data and calculate
     jal handle_weekday_waste
     add.d $f24, $f24, $f0	# Store the weekday waste in $f26 for a running total
@@ -379,6 +403,15 @@ main:
     	lw $a3, 0($a3)
 	jal drawBar		# draw bar
     
+    
+        # display running total
+    	li $v0, 4
+        la $a0, weekday_total_result	# load weekday total result string
+        syscall
+    
+    	li $v0, 3
+    	mov.d $f12, $f24	# load weekday total result double
+    	syscall
     
     # warning message
     li $v0, 4
@@ -462,6 +495,15 @@ main:
 	jal drawBar		# draw bar
     
     
+        # display weekend running total
+        li $v0, 4
+        la $a0, weekend_total_result	# load weekend total result string
+        syscall
+    
+    	li $v0, 3
+    	mov.d $f12, $f24	# load weekend total result double
+    	syscall
+    
     
     # Input weekend transportation data
     jal handle_weekend_transportation
@@ -496,10 +538,20 @@ main:
     	lw $a3, 0($a3)
 	jal drawBar		# draw bar
 
+    	# display weekend running total
+        li $v0, 4
+        la $a0, weekend_total_result	# load weekend total result string
+        syscall
+    
+    	li $v0, 3
+    	mov.d $f12, $f24	# load weekend total result double
+    	syscall
+
+
 # Input weekend waste data
     jal handle_weekend_waste
-    add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
-# Display weekday transportation emissions
+    add.d $f24, $f24, $f0	# Store the weekend energy in $f24 for a running total
+# Display weekend transportation emissions
     jal display_weekend_waste_emissions
 
    
@@ -530,9 +582,15 @@ main:
       
        
          
-           
+
+    	# display weekend running total
+        li $v0, 4
+        la $a0, weekend_total_result	# load weekend total result string
+        syscall
     
-    
+    	li $v0, 3
+    	mov.d $f12, $f24	# load weekend total result double
+    	syscall
     
       # warning message
     li $v0, 4
@@ -565,11 +623,39 @@ main:
 	jal drawBar		# draw bar
 	
 	
-	add.d $f0, $f22, $f24	# set total emissions in $f0
+	add.d $f0, $f22, $f24	# set weekly total emissions in $f0
+	
+	
+	li $v0, 4
+        la $a0, week_total_result	# load week total result string
+        syscall
+    
+    	li $v0, 3
+    	mov.d $f12, $f0	# load week total result double
+    	syscall
+    
+	
 	
 	la $t0, WEEKS_IN_A_YEAR	
     ldc1 $f20, 0($t0)	# load 52 into f20
     mul.d $f0, $f20, $f0
+    
+    
+    	li $v0, 4
+        la $a0, yearly_projection_result	# load yearly projection result string
+        syscall
+    
+    	li $v0, 3
+    	mov.d $f12, $f0	# load yearly projection result double
+    	syscall
+    
+	
+        li $v0, 4
+        la $a0, average_american_result	# load average american string
+        syscall
+    
+    
+    
     
         # Normalize total emissions
 	jal normalize_emission_total  # Normalize the emission value in $f0
