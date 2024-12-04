@@ -9,6 +9,7 @@
 .globl waste1
 .globl waste2
 .globl warning
+.globl feedback
 .globl buffer
 
 # Weekday waste
@@ -255,6 +256,7 @@ transport2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects
 waste1:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
 waste2:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
 warning:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/warning.txt"
+feedback:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/feedback.txt"
 buffer:		.space 1024 
 
 # Comments based on projection compared to average
@@ -265,6 +267,7 @@ equal_msg:		.asciiz "\nYour yearly projection of carbon emission is exactly the 
 more_than_msg:		.asciiz "\nYour yearly projection of carbon emission is more than the U.S. average emission. What are you doing with your life???"
 US_average:		.double 16000
 half_average:		.double 8000
+
 .globl main
 .text
 
@@ -272,7 +275,7 @@ half_average:		.double 8000
 
 main:
 # set the frame pointer to the beginning of the stack
-    move $fp, $sp       
+    	move $fp, $sp       
     
     	la $a0, warning		# set path
     	la $a1, buffer		# set buffer
@@ -359,10 +362,10 @@ main:
     
     
     
-    mov.d $f24, $f0		# Store the weekday transportation in $f24 for a running total
+    	mov.d $f24, $f0		# Store the weekday transportation in $f24 for a running total
 
-    # Display weekday transportation emissions
-    jal display_weekday_transportation_emissions
+    	# Display weekday transportation emissions
+    	jal display_weekday_transportation_emissions
  
        mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
            # Normalize total emissions for weekdays
@@ -490,7 +493,7 @@ main:
 	jal drawBar		# draw bar
     
     
-    mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar  
+    	mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar  
     
            # Normalize total emissions for weekdays
 	jal normalize_emission_weekday  # Normalize the emission value in $f0
@@ -513,14 +516,14 @@ main:
     	mov.d $f12, $f24	# load weekday total result double
     	syscall
     
-    # warning message
-    li $v0, 4
-    la $a0, reset_bar_graphs_message	# display reset bars message
-    syscall
+    	# warning message
+    	li $v0, 4
+    	la $a0, reset_bar_graphs_message	# display reset bars message
+    	syscall
     
-    li $v0, 32
-    la $a0, 5000	# sleep for 5 seconds
-    syscall
+    	li $v0, 32
+    	la $a0, 5000	# sleep for 5 seconds
+    	syscall
     
     
     
@@ -556,10 +559,10 @@ main:
 	jal drawBar		# draw bar
 	
     
-    mov.d $f22, $f24	# move current total to $f22 to save and then reset total to get total for weekend
+    	mov.d $f22, $f24	# move current total to $f22 to save and then reset total to get total for weekend
     
-    la $t0, ZERO_DOUBLE	
-    ldc1 $f24, 0($t0)	# load zero into f24
+    	la $t0, ZERO_DOUBLE	
+    	ldc1 $f24, 0($t0)	# load zero into f24
    
     
     # Input weekend energy data
@@ -580,8 +583,8 @@ main:
 	
 	move $a0, $t6		# Reset $a0
 	move $a1, $t7		# Reset $a1
-    jal handle_weekend_energy
-    add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
+    	jal handle_weekend_energy
+    	add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
     
     
@@ -599,7 +602,7 @@ main:
     
     
     
-           mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
+        mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
            # Normalize total emissions for weekends
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
 	move $t4, $v0           # Save normalized height in $t3
@@ -648,9 +651,6 @@ main:
     	jal handle_weekend_transportation
     	add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
     
-
-    
-    
     
       # Normalize emissions for calculated weekend  tranportation
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
@@ -686,7 +686,6 @@ main:
     	mov.d $f12, $f24	# load weekend total result double
     	syscall
 
-
 # Input weekend waste data
 
 	move $t6, $a0		# Save value in $a0
@@ -714,9 +713,8 @@ main:
     	jal handle_weekend_waste
     	add.d $f24, $f24, $f0	# Store the weekend energy in $f24 for a running total
 # Display weekend transportation emissions
-    jal display_weekend_waste_emissions
+    	jal display_weekend_waste_emissions
 
-   
  # Normalize emissions for calculated weekend waste
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
 	move $t4, $v0           # Save normalized height in $t4
@@ -729,7 +727,7 @@ main:
 	jal drawBar		# draw bar
     
     
-    mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar  
+    	mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar  
     
            # Normalize total emissions for weekends
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
@@ -741,9 +739,6 @@ main:
     	la $a3, BLUE        # set color to blue
     	lw $a3, 0($a3)
 	jal drawBar		# draw bar
-      
-       
-         
 
     	# display weekend running total
         li $v0, 4
@@ -755,15 +750,15 @@ main:
     	syscall
     
       # warning message
-    li $v0, 4
-    la $a0, reset_bar_graphs_message	# display reset bars message
-    syscall
+    	li $v0, 4
+    	la $a0, reset_bar_graphs_message	# display reset bars message
+    	syscall
     
-    li $v0, 32
-    la $a0, 5000	# sleep for 5 seconds
-    syscall
+    	li $v0, 32
+    	la $a0, 5000	# sleep for 5 seconds
+    	syscall
     
-   la $a0, WHITE		# set white as the background color
+   	la $a0, WHITE		# set white as the background color
 	lw $a0, 0($a0)		
 	jal backgroundColor	# color the background
 	 
@@ -799,8 +794,8 @@ main:
 	
 	
 	la $t0, WEEKS_IN_A_YEAR	
-    ldc1 $f20, 0($t0)	# load 52 into f20
-    mul.d $f0, $f20, $f0
+    	ldc1 $f20, 0($t0)	# load 52 into f20
+    	mul.d $f0, $f20, $f0
     
     
     	li $v0, 4
@@ -818,10 +813,7 @@ main:
         li $v0, 4
         la $a0, average_american_result	# load average american string
         syscall
-    
-    
-    
-    
+
         # Normalize total emissions
 	jal normalize_emission_total  # Normalize the emission value in $f0
 	move $t4, $v0           # Save normalized height in $t3
@@ -832,13 +824,10 @@ main:
     	la $a3, BLUE        # set color to blue
     	lw $a3, 0($a3)
 	jal drawBar		# draw bar
-      
-		
-    	
-    la $t1, AVERAGE_AMERICAN_EMISSION	
-    ldc1 $f0, 0($t1)	# load 16000 into f0
-
-    
+          	
+    	la $t1, AVERAGE_AMERICAN_EMISSION	
+    	ldc1 $f0, 0($t1)	# load 16000 into f0
+   
         # Normalize total emissions
 	jal normalize_emission_total  # Normalize the emission value in $f0
 	move $t4, $v0           # Save normalized height in $t3
@@ -906,73 +895,80 @@ more_than:
   
 exit:  
     
+        move $t6, $a0		# Save value in $a0
+    	move $t7, $a1		# Save value in $a1
+    	
+    	li $v0, 11		# Newline to seperate the feedback from the projection msg
+	la $a0, 10
+	syscall
+    
+    	la $a0, feedback		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	move $a0, $t6		# Reset $a0
+	move $a1, $t7		# Reset $a1
         
-    # Exit program
-    li $v0, 10
-    syscall
-
-
+    	# Exit program
+    	li $v0, 10
+    	syscall
 
 
 
 # Display the weekday transportation emissions
 display_weekday_transportation_emissions:
-    addiu $sp, $sp, -4       # Allocate space on the stack
-    sw $ra, 0($sp)           # Save return address
+    	addiu $sp, $sp, -4       # Allocate space on the stack
+    	sw $ra, 0($sp)           # Save return address
 
+    	li $v0, 4
+    	la $a0, weekday_transportation_result
+    	syscall
 
+    	li $v0, 3
+    	mov.d $f12, $f0          # Load emissions for printing
+    	syscall
 
-
-    li $v0, 4
-    la $a0, weekday_transportation_result
-    syscall
-
-    li $v0, 3
-    mov.d $f12, $f0          # Load emissions for printing
-    syscall
-
-    lw $ra, 0($sp)           # Restore return address
-    addiu $sp, $sp, 4        # Deallocate stack space
-    jr $ra                   # Returning control to main
+    	lw $ra, 0($sp)           # Restore return address
+    	addiu $sp, $sp, 4        # Deallocate stack space
+    	jr $ra                   # Returning control to main
     
     # Display the weekday transportation emissions
 display_weekday_energy_emissions:
-    addiu $sp, $sp, -4       # Allocate space on the stack
-    sw $ra, 0($sp)           # Save return address
+    	addiu $sp, $sp, -4       # Allocate space on the stack
+    	sw $ra, 0($sp)           # Save return address
 
+    	li $v0, 4
+    	la $a0, weekday_energy_result
+   	syscall
 
+    	li $v0, 3
+    	mov.d $f12, $f0          # Load emissions for printing
+    	syscall
 
-
-
-
-    li $v0, 4
-    la $a0, weekday_energy_result
-    syscall
-
-    li $v0, 3
-    mov.d $f12, $f0          # Load emissions for printing
-    syscall
-
-    lw $ra, 0($sp)           # Restore return address
-    addiu $sp, $sp, 4        # Deallocate stack space
-    jr $ra                   # Returning control to main
+    	lw $ra, 0($sp)           # Restore return address
+    	addiu $sp, $sp, 4        # Deallocate stack space
+    	jr $ra                   # Returning control to main
 
 # Display the weekend waste emissions
 display_weekend_waste_emissions:
-    addiu $sp, $sp, -4       # Allocate space on the stack
-    sw $ra, 0($sp)           # Save return address
+    	addiu $sp, $sp, -4       # Allocate space on the stack
+    	sw $ra, 0($sp)           # Save return address
     
-    li $v0, 4
-    la $a0, weekend_waste_result
-    syscall
+    	li $v0, 4
+    	la $a0, weekend_waste_result
+    	syscall
 
-    li $v0, 3
-    mov.d $f12, $f0          # Load emissions for printing
-    syscall
+    	li $v0, 3
+    	mov.d $f12, $f0          # Load emissions for printing
+    	syscall
 
-    lw $ra, 0($sp)           # Restore return address
-    addiu $sp, $sp, 4        # Deallocate stack space
-    jr $ra                   # Returning control to main
+    	lw $ra, 0($sp)           # Restore return address
+    	addiu $sp, $sp, 4        # Deallocate stack space
+    	jr $ra                   # Returning control to main
     
     
     
