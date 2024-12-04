@@ -856,6 +856,8 @@ less_than_half:
         la $a0, less_half_msg	# load less_half_msg string
         syscall
          
+        jal celebratory
+         
    	j exit  
   
 between_half_and_equal:  
@@ -871,12 +873,18 @@ between_half_and_equal:
    	li $v0, 4
         la $a0, half_and_equal_msg	# load half_and_equal_msg string
         syscall
+        
+        jal less_celebratory 
+        
    	j exit  
    	
 equal_half:
   	li $v0, 4
         la $a0, equal_half_msg	# load equal_half_msg string
         syscall
+        
+        jal less_celebratory 
+        
    	j exit  
   
 equal:  
@@ -884,6 +892,9 @@ equal:
    	li $v0, 4
         la $a0, equal_msg	# load equal_msg string
         syscall
+        
+	jal bad
+        
    	j exit  
   
 more_than:  
@@ -891,6 +902,9 @@ more_than:
    	li $v0, 4
         la $a0, more_than_msg	# load more_than_msg string
         syscall  
+        
+	jal bad
+        
    	j exit  
   
 exit:  
@@ -969,8 +983,138 @@ display_weekend_waste_emissions:
     	lw $ra, 0($sp)           # Restore return address
     	addiu $sp, $sp, 4        # Deallocate stack space
     	jr $ra                   # Returning control to main
-    
-    
+ 
+# Celebratory sound
+# $a0 and $v0 should be available       
+celebratory:  
+	li $a0, 0     # Load piano  
+      	li $v0, 33  
+      	syscall 
+	
+      	li $a0, 523    # C5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+
+      	li $a0, 587    # D5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 659    # E5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 698    # F5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 784    # G5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+      	
+      	jr $ra  
+  
+# Less celebratory sound  
+# $a0 and $v0 should be available
+less_celebratory:  
+	li $a0, 0     # Load piano  
+      	li $v0, 33  
+      	syscall 
+      	
+      	li $a0, 392    # G4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 440    # A4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 493    # B4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 523    # C5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 587    # D5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall 
+      	 
+      	jr    $ra  
+  
+# Bad sound 
+# $a0 and $v0 should be available 
+bad:  
+	li $a0, 0     # Load piano  
+      	li $v0, 33  
+      	syscall 
+      	
+      	li $a0, 261    # C4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 294    # D4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 329    # E4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 349    # F4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 392    # G4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall 
+      	 
+      	jr    $ra
     
     
 
