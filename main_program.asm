@@ -115,6 +115,7 @@
 .globl ef_recycled
 .globl ef_non_recycled
 
+
 .data
   # set display to:
 #	Pixels width and height to 4x4
@@ -256,6 +257,14 @@ waste2:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fa
 warning:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/warning.txt"
 buffer:		.space 1024 
 
+# Comments based on projection compared to average
+less_half_msg:		.asciiz "\nCongrats! Your yearly projection of carbon emission is less than half of the U.S. average emission!"
+half_and_equal_msg:	.asciiz "\nYour yearly projection of carbon emission is less than the U.S. average emission but more than half." 
+equal_half_msg:		.asciiz "\nYour yearly projection of carbon emission is exactly half of the U.S. average emission. That's kind of impressive."
+equal_msg:		.asciiz "\nYour yearly projection of carbon emission is exactly the U.S. average emission. You can do better."
+more_than_msg:		.asciiz "\nYour yearly projection of carbon emission is more than the U.S. average emission. What are you doing with your life???"
+US_average:		.double 16000
+half_average:		.double 8000
 .globl main
 .text
 
@@ -802,6 +811,9 @@ main:
     	mov.d $f12, $f0	# load yearly projection result double
     	syscall
     
+	mov.d $f18, $f12		# Set $f18 to the yearly projection result so that we can preform branching
+	l.d $f16, US_average
+	l.d $f14, half_average
 	
         li $v0, 4
         la $a0, average_american_result	# load average american string
@@ -836,7 +848,63 @@ main:
  	move $a2, $t4        # set bar height to normalized height
     	la $a3, PURPLE        # set color to blue
     	lw $a3, 0($a3)
-	jal drawBar		# draw bar
+	jal drawBar		# draw bar 
+  
+	# Check if the projection is less than half of the average 
+	c.lt.d $f18, $f14  
+	bc1t less_than_half
+  
+	# Check if the projection is more than average 
+	c.lt.d $f16, $f18  
+	bc1t more_than  
+  
+	# If none of the conditions are true, then the projections is less than or equal to average but greater than or equal to half of the average  
+	j between_half_and_equal  
+  
+less_than_half:  
+   	# If projection is less than half of average
+   	li $v0, 4
+        la $a0, less_half_msg	# load less_half_msg string
+        syscall
+         
+   	j exit  
+  
+between_half_and_equal:  
+   	# Check if projection is equal to average  
+   	c.eq.d $f18, $f16  
+   	bc1t equal  
+  	
+  	# Check if the projection is exactly half of the average
+  	c.eq.d $f18, $f14  
+   	bc1t equal_half
+  
+   	# Code to handle the case where $f18 is less than $f16 but greater than half of $f16  
+   	li $v0, 4
+        la $a0, half_and_equal_msg	# load half_and_equal_msg string
+        syscall
+   	j exit  
+   	
+equal_half:
+  	li $v0, 4
+        la $a0, equal_half_msg	# load equal_half_msg string
+        syscall
+   	j exit  
+  
+equal:  
+   	# Code to handle the case where $f18 is equal to $f16
+   	li $v0, 4
+        la $a0, equal_msg	# load equal_msg string
+        syscall
+   	j exit  
+  
+more_than:  
+   	# Code to handle the case where $f18 is more than $f16
+   	li $v0, 4
+        la $a0, more_than_msg	# load more_than_msg string
+        syscall  
+   	j exit  
+  
+exit:  
     
         
     # Exit program
