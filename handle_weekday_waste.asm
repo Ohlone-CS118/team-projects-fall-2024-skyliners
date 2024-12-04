@@ -8,6 +8,7 @@ handle_weekday_waste:
     	sw $ra, 4($sp)           # Save return address
     	sw $t0, 0($sp)           # Save temporary register $t0
     	
+ask_lunch_question: 	
     	li $v0, 4
     	la $a0, lunch_question
     	syscall
@@ -29,6 +30,13 @@ ask_notes_question:
     	beq $t1, 1, get_waste_hours		# If choice = digital device then go to get_waste_hours
     	beq $t1, 2, get_waste_pages		# If choice = recycled paper then go to get_waste_pages
     	beq $t1, 3, get_waste_pages		# If choice = regular paper then go to get_waste_pages
+    	
+    	# If user inputs something other than one of the choices
+	li $v0, 4
+    	la $a0, invalid_user_input
+    	syscall
+    	
+    	j ask_notes_question
     	
 get_waste_hours:
 	li $v0, 4
@@ -96,6 +104,13 @@ get_lunch_emission:
 	beq $t1, 2, get_aluminum_ef
 	beq $t1, 3, get_plastic_ef
 	beq $t1, 4, get_pre_packaged_ef
+	
+	# If user inputs something other than one of the choices
+	li $v0, 4
+    	la $a0, invalid_user_input
+    	syscall
+    	
+    	j ask_lunch_question
 	
 get_reusable_ef: 
 	l.d $f8, ef_reusable

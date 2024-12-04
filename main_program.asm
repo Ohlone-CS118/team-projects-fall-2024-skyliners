@@ -1,6 +1,9 @@
 # Main file
 # contains all the data and the main function
 
+# When the user has an invaild input
+.globl invalid_user_input
+   
 # Text files
 .globl energy1
 .globl energy2
@@ -152,6 +155,9 @@ MAX_NORMALIZED_HEIGHT: .double 1
 ZERO_DOUBLE: .double 0
 AVERAGE_AMERICAN_EMISSION: .double 16000
 WEEKS_IN_A_YEAR: .double 52
+
+# Invalid user input
+invalid_user_input:	.asciiz "\nInvalid input! Please try again.\n"
 
 # Prompts for weekday waste
 lunch_question: 	.asciiz "\n\nHow do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
