@@ -253,7 +253,7 @@ ef_food_waste_significant: .double 10.0
 ef_packaging_waste_none: .double 0.0
 ef_packaging_waste_moderate: .double 3.0
 ef_packaging_waste_significant: .double 6.0
-ef_recycled: .double -1.0
+ef_recycled: .double 1.0
 ef_non_recycled: .double 2.0
 
 # Text files. Different paths for ech person
