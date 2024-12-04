@@ -1,4 +1,0 @@
-green = transportation (representing environment)
-yellow = electricity (representing lightbulb)
-black = wastes (representing black trash bin)
-blue = total
