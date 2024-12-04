@@ -44,12 +44,12 @@ handle_weekend_waste:
     cvt.d.w $f0, $f0             # Convert $f0 to double
     mul.d $f0, $f12, $f0        # Multiply total emissions by 2
 
-    # Restore stack and exit
+    # Restore stack
     lw $ra, 4($sp)               # Restore return address
     lw $t0, 0($sp)               # Restore $t0
     addiu $sp, $sp, 8            # Deallocate stack space
-    li $v0, 10
-    syscall
+
+    jr $ra
 
 # Subroutine for grocery bag emissions
 handle_bag_emission:

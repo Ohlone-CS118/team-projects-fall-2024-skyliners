@@ -1,8 +1,9 @@
 .globl drawBar
 .globl backgroundColor
 .globl draw_pixel
-.globl normalize_emission
-
+.globl normalize_emission_weekday
+.globl normalize_emission_weekend
+.globl normalize_emission_total
 
 	
 	
@@ -115,12 +116,12 @@ barExit:
 
 
 
-# Normalize emissions to a height in the range 0-64
+# Normalize weekday emissions to a height in the range 0-64
 # Preconditions:
-#   $f0 = emission value (in kg CO₂)
+#   $f0 = emission value (in kg CO2)
 # Postconditions:
 #   $v0 = normalized height (integer 0-64)
-normalize_emission:
+normalize_emission_weekday:
 	addi $sp, $sp, -8		# make room on the stack for 2 words ($ra, $fp)
 	sw $fp, 4($sp)		# store frame pointer
 	addi $fp, $sp, 4	# move the $fp to the beginning of this stack frame
@@ -129,15 +130,15 @@ normalize_emission:
 	la $s2, MAX_NORMALIZED_HEIGHT # load max normalized value for height (1)
 	l.d $f26, 0($s2)	# load 1 as max value into $f26
 
-    li $s0, 300            # Assume max emission is 300 kg CO2
-    mtc1 $s0, $f30          # Move 300 into $f30
-    cvt.d.w $f30, $f30       # Convert 300 to double
+    li $s0, 250            # Assume max emission is 250 kg CO2
+    mtc1 $s0, $f30          # Move 250 into $f30
+    cvt.d.w $f30, $f30       # Convert 250 to double
 
-    div.d $f28, $f0, $f30    # emission / 300 (normalize to 0-1)
+    div.d $f28, $f0, $f30    # emission / 250 (normalize to 0-1)
     c.lt.d $f26, $f28	# if normalized value > 1
-    bc1t normalize_emission_overflow # branch if true
+    bc1t normalize_emission_weekday_overflow # branch if true
     
-normalize_emission_resume:    
+normalize_emission_weekday_resume:    
     la $s1, HEIGHT
     lw $s1, 0($s1)             # Max height (64 pixels) 
     mtc1 $s1, $f30          # Move max height into $f30
@@ -156,6 +157,107 @@ normalize_emission_resume:
     jr $ra
 
     
-normalize_emission_overflow:
+normalize_emission_weekday_overflow:
 	mov.d $f28, $f26 # set the value 1 in f28
-	j normalize_emission_resume
+	j normalize_emission_weekday_resume
+	
+	
+
+
+
+# Normalize weekend emissions to a height in the range 0-64
+# Preconditions:
+#   $f0 = emission value (in kg CO2)
+# Postconditions:
+#   $v0 = normalized height (integer 0-64)
+normalize_emission_weekend:
+	addi $sp, $sp, -8		# make room on the stack for 2 words ($ra, $fp)
+	sw $fp, 4($sp)		# store frame pointer
+	addi $fp, $sp, 4	# move the $fp to the beginning of this stack frame
+	sw $ra, -4($fp)		# store return address
+
+	la $s2, MAX_NORMALIZED_HEIGHT # load max normalized value for height (1)
+	l.d $f26, 0($s2)	# load 1 as max value into $f26
+
+    li $s0, 100            # Assume max emission is 100 kg CO2
+    mtc1 $s0, $f30          # Move 100 into $f30
+    cvt.d.w $f30, $f30       # Convert 100 to double
+
+    div.d $f28, $f0, $f30    # emission / 100 (normalize to 0-1)
+    c.lt.d $f26, $f28	# if normalized value > 1
+    bc1t normalize_emission_weekend_overflow # branch if true
+    
+normalize_emission_weekend_resume:    
+    la $s1, HEIGHT
+    lw $s1, 0($s1)             # Max height (64 pixels) 
+    mtc1 $s1, $f30          # Move max height into $f30
+    cvt.d.w $f30, $f30       # Convert 64 to double
+    mul.d $f28, $f28, $f30    # emission_normalized * 64
+
+    cvt.w.d $f28, $f28       # Convert result to integer
+    mfc1 $v0, $f28          # Move result into $v0
+
+    
+    
+    	lw $ra, -4($fp)			# restore return address
+	lw $fp, 0($fp)			# restore frame pointer
+	addi $sp, $sp, 8		# pop off the stack
+    
+    jr $ra
+
+    
+normalize_emission_weekend_overflow:
+	mov.d $f28, $f26 # set the value 1 in f28
+	j normalize_emission_weekend_resume
+
+
+
+
+
+
+
+# Normalize total emissions to a height in the range 0-64
+# Preconditions:
+#   $f0 = emission value (in kg CO2)
+# Postconditions:
+#   $v0 = normalized height (integer 0-64)
+normalize_emission_total:
+	addi $sp, $sp, -8		# make room on the stack for 2 words ($ra, $fp)
+	sw $fp, 4($sp)		# store frame pointer
+	addi $fp, $sp, 4	# move the $fp to the beginning of this stack frame
+	sw $ra, -4($fp)		# store return address
+
+	la $s2, MAX_NORMALIZED_HEIGHT # load max normalized value for height (1)
+	l.d $f26, 0($s2)	# load 1 as max value into $f26
+
+    li $s0, 32000            # Assume max emission is 32000 kg CO2
+    mtc1 $s0, $f30          # Move 32000 into $f30
+    cvt.d.w $f30, $f30       # Convert 32000 to double
+
+    div.d $f28, $f0, $f30    # emission / 32000 (normalize to 0-1)
+    c.lt.d $f26, $f28	# if normalized value > 1
+    bc1t normalize_emission_total_overflow # branch if true
+    
+normalize_emission_total_resume:    
+    la $s1, HEIGHT
+    lw $s1, 0($s1)             # Max height (64 pixels) 
+    mtc1 $s1, $f30          # Move max height into $f30
+    cvt.d.w $f30, $f30       # Convert 64 to double
+    mul.d $f28, $f28, $f30    # emission_normalized * 64
+
+    cvt.w.d $f28, $f28       # Convert result to integer
+    mfc1 $v0, $f28          # Move result into $v0
+
+    
+    
+    	lw $ra, -4($fp)			# restore return address
+	lw $fp, 0($fp)			# restore frame pointer
+	addi $sp, $sp, 8		# pop off the stack
+    
+    jr $ra
+
+    
+normalize_emission_total_overflow:
+	mov.d $f28, $f26 # set the value 1 in f28
+	j normalize_emission_total_resume
+
