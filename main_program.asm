@@ -76,6 +76,32 @@
 
 .globl MAX_NORMALIZED_HEIGHT
 
+# weekend waste
+.globl bag_question
+.globl gathering_question
+.globl food_waste_question
+.globl packaging_waste_question
+.globl personal_waste_question
+.globl result_msg
+.globl newline
+.globl invalid_input
+.globl weekend_waste_result
+
+.globl ef_reusable_bag
+.globl ef_paper_bag
+.globl ef_plastic_bag
+.globl ef_reusable_items
+.globl ef_mixed_items
+.globl ef_disposable_items
+.globl ef_food_waste_none
+.globl ef_food_waste_moderate
+.globl ef_food_waste_significant
+.globl ef_packaging_waste_none
+.globl ef_packaging_waste_moderate
+.globl ef_packaging_waste_significant
+.globl ef_recycled
+.globl ef_non_recycled
+
 .data
   # set display to:
 #	Pixels width and height to 4x4
@@ -143,6 +169,17 @@ weekend_transportation_main_question:	.asciiz "How do you travel to leisure acti
 weekend_miles_question:	.asciiz "\nHow many miles do you travel daily? "
 weekend_carpool_question: 	.asciiz "\nIf carpool, how many people (including yourself)? "
 
+# Prompts for weekend waste
+bag_question: .asciiz "What kind of bags do you use for groceries? (1: Reusable tote, 2: Paper bag, 3: Plastic bag): "
+gathering_question: .asciiz "\nAfter hosting a gathering, did you use reusable or disposable items? (1: Reusable items, 2: Mixed items, 3: Disposable items): "
+food_waste_question: .asciiz "\nHow much food waste did you generate during the weekend? (1: None, 2: Moderate, 3: Significant): "
+packaging_waste_question: .asciiz "\nHow much packaging waste (e.g., boxes, plastic wraps) did you generate? (1: None, 2: Moderate, 3: Significant): "
+personal_waste_question: .asciiz "\nDid you separate your recyclable waste? (1: Yes, 2: No): "
+result_msg: .asciiz "\nYour total weekend CO₂ emissions are: "
+newline: .asciiz "\n"
+invalid_input: .asciiz "\nInvalid input! Please try again.\n"
+weekend_waste_result: .asciiz "\nYour weekday transportation emissions (kg CO2): "
+
 # Emission factors (double-precision)
 ef_bus: .double 0.1            # Public transit (kg CO2 per mile)
 ef_car: .double 0.3            # Personal car (kg CO2 per mile)
@@ -166,6 +203,21 @@ ef_movie: .double 0.08          # Watching movies on the TV (kg CO2 per hour)
 ef_gaming: .double 0.16  	# Gaming on the TV (kg CO2 per hour)(emission from TV + from gaming system(0.08))
 ef_baking: .double 0.02        	# Baking (kg CO2 per minute)
 
+
+ef_reusable_bag: .double 0.05
+ef_paper_bag: .double 0.15
+ef_plastic_bag: .double 0.03
+ef_reusable_items: .double 0.08
+ef_mixed_items: .double 0.20
+ef_disposable_items: .double 0.40
+ef_food_waste_none: .double 0.0
+ef_food_waste_moderate: .double 5.0
+ef_food_waste_significant: .double 10.0
+ef_packaging_waste_none: .double 0.0
+ef_packaging_waste_moderate: .double 3.0
+ef_packaging_waste_significant: .double 6.0
+ef_recycled: .double -1.0
+ef_non_recycled: .double 2.0
 
 
 .globl main
@@ -433,6 +485,16 @@ main:
     	la $a3, BLUE        # set color to blue
     	lw $a3, 0($a3)
 	jal drawBar		# draw bar
+
+# Input weekend waste data
+    jal handle_weekend_waste
+
+# Display weekday transportation emissions
+    jal display_weekend_waste_emissions
+    
+    # Exit program
+    li $v0, 10
+    syscall
     
     
     
@@ -486,6 +548,24 @@ display_weekday_energy_emissions:
     lw $ra, 0($sp)           # Restore return address
     addiu $sp, $sp, 4        # Deallocate stack space
     jr $ra                   # Returning control to main
+
+# Display the weekend waste emissions
+display_weekend_waste_emissions:
+    addiu $sp, $sp, -4       # Allocate space on the stack
+    sw $ra, 0($sp)           # Save return address
+    
+    li $v0, 4
+    la $a0, weekend_waste_result
+    syscall
+
+    li $v0, 3
+    mov.d $f12, $f0          # Load emissions for printing
+    syscall
+
+    lw $ra, 0($sp)           # Restore return address
+    addiu $sp, $sp, 4        # Deallocate stack space
+    jr $ra                   # Returning control to main
+    
     
     
     
