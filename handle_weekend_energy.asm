@@ -92,7 +92,13 @@ end_weekend_energy:
     	cvt.d.w $f6, $f6
     	mul.d $f0, $f6, $f4       # Weekly energy emissions
    	
-   	
+   	li $v0, 4
+    	la $a0, weekend_energy_result
+    	syscall
+
+    	li $v0, 3
+    	mov.d $f12, $f0          # Load emissions for printing
+    	syscall
    	
    	# Cleanup
     	lw $ra, 4($sp)              # Restore return address

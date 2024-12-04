@@ -122,6 +122,14 @@ end_handle_weekday_waste:
     	cvt.d.w $f4, $f4
     	mul.d $f0, $f6, $f4       # Weekly waste emissions
     	
+    	li $v0, 4
+    	la $a0, weekday_waste_result
+    	syscall
+
+    	li $v0, 3
+    	mov.d $f12, $f0          # Load emissions for printing
+    	syscall
+    	
     	# Cleanup
     	lw $ra, 4($sp)              # Restore return address
     	lw $t0, 0($sp)              # Restore $t0

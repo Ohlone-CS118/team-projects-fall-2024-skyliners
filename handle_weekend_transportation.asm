@@ -88,6 +88,15 @@ process_weekend_emission:
     	jr $ra                   # Returning control to handle_weekday_transportation
 
 end_weekend_transportation:
+	li $v0, 4
+    	la $a0, weekend_transportation_result
+    	syscall
+
+    	li $v0, 3
+    	mov.d $f12, $f0          # Load emissions for printing
+    	syscall
+
+
     	lw $ra, 4($sp)           # Restore return address
     	lw $t0, 0($sp)           # Restore $t0
     	addiu $sp, $sp, 8        # Deallocate stack space
