@@ -852,6 +852,11 @@ main:
   
 less_than_half:  
    	# If projection is less than half of average
+   	
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+	
    	li $v0, 4
         la $a0, less_half_msg	# load less_half_msg string
         syscall
@@ -870,6 +875,10 @@ between_half_and_equal:
    	bc1t equal_half
   
    	# Code to handle the case where $f18 is less than $f16 but greater than half of $f16  
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+   	
    	li $v0, 4
         la $a0, half_and_equal_msg	# load half_and_equal_msg string
         syscall
@@ -879,6 +888,10 @@ between_half_and_equal:
    	j exit  
    	
 equal_half:
+	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+
   	li $v0, 4
         la $a0, equal_half_msg	# load equal_half_msg string
         syscall
@@ -889,6 +902,10 @@ equal_half:
   
 equal:  
    	# Code to handle the case where $f18 is equal to $f16
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+	
    	li $v0, 4
         la $a0, equal_msg	# load equal_msg string
         syscall
@@ -899,6 +916,10 @@ equal:
   
 more_than:  
    	# Code to handle the case where $f18 is more than $f16
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+	
    	li $v0, 4
         la $a0, more_than_msg	# load more_than_msg string
         syscall  
@@ -913,6 +934,10 @@ exit:
     	move $t7, $a1		# Save value in $a1
     	
     	li $v0, 11		# Newline to seperate the feedback from the projection msg
+	la $a0, 10
+	syscall
+	
+	li $v0, 11		# Newline to seperate the feedback from the projection msg
 	la $a0, 10
 	syscall
     
