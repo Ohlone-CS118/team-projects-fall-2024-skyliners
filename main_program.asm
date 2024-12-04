@@ -265,7 +265,21 @@ main:
 # set the frame pointer to the beginning of the stack
     move $fp, $sp       
     
-    	
+    	la $a0, warning		# set path
+    	la $a1, buffer		# set buffer
+    	jal readFromFile
+    
+    	li $v0, 4
+    	la $a0, buffer
+	syscall
+	
+	li $v0, 11		# Newline to seperate the warning from the rest of the code
+	la $a0, 10
+	syscall
+	
+	li $v0, 11		# Newline to seperate the warning from the rest of the code
+	la $a0, 10
+	syscall
     
     
 	la $a0, WHITE		# set white as the background color
