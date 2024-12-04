@@ -8,6 +8,7 @@
 .globl waste_pages
 .globl waste_invalid_hours_msg
 .globl waste_invalid_pages_msg
+.globl weekday_waste_result
 
 .globl ef_reusable
 .globl ef_aluminum 
@@ -49,6 +50,7 @@
 .globl weekend_energy_invalid_hours_msg
 .globl weekend_energy_baking_minutes
 .globl weekend_enegry_invalid_minutes_msg
+.globl weekend_energy_result
 
 .globl ef_movie
 .globl ef_gaming
@@ -58,6 +60,7 @@
 .globl weekend_transportation_main_question
 .globl weekend_miles_question
 .globl weekend_carpool_question
+.globl weekend_transportation_result
 
 
 
@@ -131,12 +134,13 @@ MAX_NORMALIZED_HEIGHT: .double 1
 ZERO_DOUBLE: .double 0
 
 # Prompts for weekday waste
-lunch_question: 	.asciiz "How do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
-notes_question:		.asciiz "What do you use for notes? (1-Digital device, 2-Recycled paper, 3-Regular notebook): "
-waste_hours:		.asciiz "How many hours do you use your digital device?(0-24): "
-waste_pages:		.asciiz "How many pages do you use? (Enter a number greater or equal to 0): "
+lunch_question: 	.asciiz "\n\nHow do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
+notes_question:		.asciiz "\nWhat do you use for notes? (1-Digital device, 2-Recycled paper, 3-Regular notebook): "
+waste_hours:		.asciiz "\nHow many hours do you use your digital device?(0-24): "
+waste_pages:		.asciiz "\nHow many pages do you use? (Enter a number greater or equal to 0): "
 waste_invalid_hours_msg: 	.asciiz "\nInvalid input! Please enter a value between 0 and 24."
 waste_invalid_pages_msg: 	.asciiz "\nInvalid input! Please enter a value greater than 0."
+weekday_waste_result:		.asciiz "\nYour weekday waste emissions (kg CO2): "
 
 # Prompts for weekday transportation
 main_question: .asciiz "\nDo you go to (1-School, 2-Work, 3-Both)? "
@@ -146,7 +150,7 @@ carpool_question: .asciiz "\nIf carpool, how many people (including yourself)? "
 weekday_transportation_result: .asciiz "\nYour weekday transportation emissions (kg CO2): "
 
 # Prompts for weekday energy
-solar_question: .asciiz "\nDo you have solar panels installed? (1-Yes, 2-No): "
+solar_question: .asciiz "\n\nDo you have solar panels installed? (1-Yes, 2-No): "
 bulb_question: .asciiz "\nDo you use LED bulbs or Incandescent bulbs? (1-LED, 2-Incandescent): "
 light_hours_question: .asciiz "\nHow many hours do you leave your lights on daily? (0-24): "
 invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 24."
@@ -155,22 +159,24 @@ heater_hours_question: .asciiz "\nHow many hours do you use the heater daily? (0
 weekday_energy_result: .asciiz "\nYour weekday energy emissions (kg CO2): "
 
 # Lets user know bar graphs are resetting
-reset_bar_graphs_message:	.asciiz "\nNow resetting bar graphs to display the weekend data. Clearing them in 5 seconds.\n"
+reset_bar_graphs_message:	.asciiz "\n\nNow resetting bar graphs to display the weekend data. Clearing them in 5 seconds.\n"
 
 # Prompts for weekend energy
-weekend_energy_main_question:	.asciiz "Do you spend your weekend (1-Watching Movies on the TV, 2-Gaming on the TV, or 3-Baking)? "
-weekend_energy_hours_question:	.asciiz "How many hours? (0-24): "
+weekend_energy_main_question:	.asciiz "\nDo you spend your weekend (1-Watching Movies on the TV, 2-Gaming on the TV, or 3-Baking)? "
+weekend_energy_hours_question:	.asciiz "\nHow many hours? (0-24): "
 weekend_energy_invalid_hours_msg: .asciiz "\nInvalid input! Please enter a value between 0 and 24."
-weekend_energy_baking_minutes:	.asciiz "How many minutes does the item that you're baking take? (Enter a number starting from 0): "
+weekend_energy_baking_minutes:	.asciiz "\nHow many minutes does the item that you're baking take? (Enter a number starting from 0): "
 weekend_enegry_invalid_minutes_msg: .asciiz "\nInvalid input! Please enter a value greater or equal to 0."
+weekend_energy_result: .asciiz "\nYour weekend energy emissions (kg CO2): "
 
 # Prompts for weekend transport
-weekend_transportation_main_question:	.asciiz "How do you travel to leisure activities? (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Car, 5-Carpool)"
+weekend_transportation_main_question:	.asciiz "\n\nHow do you travel to leisure activities? (1-Walk, 2-Bike, 3-Bus/Public Transit, 4-Car, 5-Carpool)"
 weekend_miles_question:	.asciiz "\nHow many miles do you travel daily? "
 weekend_carpool_question: 	.asciiz "\nIf carpool, how many people (including yourself)? "
+weekend_transportation_result: .asciiz "\nYour weekend transportation emissions (kg CO2): "
 
 # Prompts for weekend waste
-bag_question: .asciiz "What kind of bags do you use for groceries? (1: Reusable tote, 2: Paper bag, 3: Plastic bag): "
+bag_question: .asciiz "\n\nWhat kind of bags do you use for groceries? (1: Reusable tote, 2: Paper bag, 3: Plastic bag): "
 gathering_question: .asciiz "\nAfter hosting a gathering, did you use reusable or disposable items? (1: Reusable items, 2: Mixed items, 3: Disposable items): "
 food_waste_question: .asciiz "\nHow much food waste did you generate during the weekend? (1: None, 2: Moderate, 3: Significant): "
 packaging_waste_question: .asciiz "\nHow much packaging waste (e.g., boxes, plastic wraps) did you generate? (1: None, 2: Moderate, 3: Significant): "
@@ -178,7 +184,7 @@ personal_waste_question: .asciiz "\nDid you separate your recyclable waste? (1: 
 result_msg: .asciiz "\nYour total weekend CO₂ emissions are: "
 newline: .asciiz "\n"
 invalid_input: .asciiz "\nInvalid input! Please try again.\n"
-weekend_waste_result: .asciiz "\nYour weekday transportation emissions (kg CO2): "
+weekend_waste_result: .asciiz "\nYour weekend waste emissions (kg CO2): "
 
 # Emission factors (double-precision)
 ef_bus: .double 0.1            # Public transit (kg CO2 per mile)
