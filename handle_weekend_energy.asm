@@ -20,6 +20,13 @@ weekend_energy_main:
 	beq $v0, 2, calculate_Gaming		# If the user chose to play games then jump to calculate_gaming
 	beq $v0, 3, calculate_Baking		# If the user chose to bake then jump to calculate_baking
 	
+	# If user inputs something other than one of the choices
+	li $v0, 4
+    	la $a0, invalid_user_input
+    	syscall
+    	
+    	j weekend_energy_main
+	
 calculate_TV:
 	li $v0, 4				# Print the hours used question
     	la $a0, weekend_energy_hours_question
