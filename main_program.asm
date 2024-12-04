@@ -205,7 +205,7 @@ gathering_question: .asciiz "\nAfter hosting a gathering, did you use reusable o
 food_waste_question: .asciiz "\nHow much food waste did you generate during the weekend? (1: None, 2: Moderate, 3: Significant): "
 packaging_waste_question: .asciiz "\nHow much packaging waste (e.g., boxes, plastic wraps) did you generate? (1: None, 2: Moderate, 3: Significant): "
 personal_waste_question: .asciiz "\nDid you separate your recyclable waste? (1: Yes, 2: No): "
-result_msg: .asciiz "\nYour total weekend COâ‚‚ emissions are: "
+result_msg: .asciiz "\nYour total weekend CO2‚‚ emissions are: "
 newline: .asciiz "\n"
 invalid_input: .asciiz "\nInvalid input! Please try again.\n"
 weekend_waste_result: .asciiz "\nYour weekend waste emissions represented by black (kg CO2): "
@@ -257,14 +257,14 @@ ef_recycled: .double 1.0
 ef_non_recycled: .double 2.0
 
 # Text files. Different paths for ech person
-energy1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
-energy2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
-transport1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
-transport2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
-waste1:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
-waste2:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
-warning:	.asciiz "./team-projects-fall-2024-skyliners/text_files/warning.txt"
-feedback:	.asciiz "./team-projects-fall-2024-skyliners/text_files/feedback.txt"
+energy1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
+energy2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
+transport1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
+transport2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
+waste1:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
+waste2:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
+warning:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/warning.txt"
+feedback:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/feedback.txt"
 buffer:		.space 1024 
 
 # Comments based on projection compared to average
