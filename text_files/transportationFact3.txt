@@ -6,5 +6,5 @@ Factors Influencing CO2 Emissions
 2. Urban development patterns, such as population density and job distribution, affect fuel efficiency and emissions.
 3. Wealthier metropolitan areas generally exhibited higher emissions per capita
 
-SOUTHWORTH, Frank, and Anthon SONNENBERG. “Set of Comparable Carbon Footprints for Highway Travel in Metropolitan America: Transportation, the Environment, and Sustainability.”
-Journal of Transportation Engineering, vol. 137, no. 6, 2011, pp. 426–35.
+SOUTHWORTH, Frank, and Anthon SONNENBERG. Set of Comparable Carbon Footprints for Highway Travel in Metropolitan America: Transportation, the Environment, and Sustainability.
+Journal of Transportation Engineering, vol. 137, no. 6, 2011, pp. 426â€“35.
