@@ -1,11 +1,11 @@
 # Weekend Waste Calulations
-# This module calculates the weekend waste emissions 
 
 .text
 .globl handle_weekend_waste
-
+# preconditions: assumes that the $a, $t, $f registers have already been saved
 # postcondition: the total waste emission for the weekday is stored in $f0
-# Handle weekend waste input and calculations
+# Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
+# Purpose: Calculates the carbon emission of the weekend waste questions
 handle_weekend_waste:
     # Set up stack
     addiu $sp, $sp, -8           # Allocate stack space
@@ -39,8 +39,8 @@ handle_weekend_waste:
     add.d $f12, $f12, $f2        # Add personal waste emissions
 
     # Multiply total emissions by 2 (for two days of the weekend)
-    li $t1, 2                    # Load the value 2 into $t1
-    mtc1 $t1, $f0                # Move $t1 into floating-point register $f0
+    li $s1, 2                    # Load the value 2 into $t1
+    mtc1 $s1, $f0                # Move $t1 into floating-point register $f0
     cvt.d.w $f0, $f0             # Convert $f0 to double
     mul.d $f0, $f12, $f0        # Multiply total emissions by 2
 
@@ -51,6 +51,10 @@ handle_weekend_waste:
 
     jr $ra
 
+# preconditions: assumes that the $a, $t, $f registers have already been saved
+# postcondition: the total waste emission for the weekday is stored in $f0
+# Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
+# Purpose: Gives prompts and calculates the carbon emission of the bag question
 # Subroutine for grocery bag emissions
 handle_bag_emission:
     li $v0, 4
@@ -59,15 +63,18 @@ handle_bag_emission:
 
     li $v0, 5
     syscall
-    move $t0, $v0
+    move $s0, $v0
 
-    li $t1, 1
-    beq $t0, $t1, bag_reusable
-    li $t1, 2
-    beq $t0, $t1, bag_paper
-    li $t1, 3
-    beq $t0, $t1, bag_plastic
-    j invalid_input_msg
+    beq $s0, 1, bag_reusable
+    beq $s0, 2, bag_paper
+    beq $s0, 3, bag_plastic
+    
+    # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
+    li $v0, 4                   # Print invalid input message
+    la $a0, invalid_user_input
+    syscall
+    
+    j handle_bag_emission
 
 bag_reusable:
     l.d $f12, ef_reusable_bag
@@ -81,6 +88,10 @@ bag_plastic:
     l.d $f12, ef_plastic_bag
     jr $ra
 
+# preconditions: assumes that the $a, $t, $f registers have already been saved
+# postcondition: the total waste emission for the weekday is stored in $f0
+# Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
+# Purpose: Gives prompts and calculates the carbon emission of the weekend waste questions
 # Subroutine for gathering emissions
 handle_gathering_emission:
     li $v0, 4
@@ -89,15 +100,19 @@ handle_gathering_emission:
 
     li $v0, 5
     syscall
-    move $t0, $v0
+    move $s0, $v0
 
-    li $t1, 1
-    beq $t0, $t1, gathering_reusable
-    li $t1, 2
-    beq $t0, $t1, gathering_mixed
-    li $t1, 3
-    beq $t0, $t1, gathering_disposable
-    j invalid_input_msg
+
+    beq $s0, 1, gathering_reusable
+    beq $s0, 2, gathering_mixed
+    beq $s0, 3, gathering_disposable
+
+    # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
+    li $v0, 4                   # Print invalid input message
+    la $a0, invalid_user_input
+    syscall
+    
+    j handle_gathering_emission
 
 gathering_reusable:
     l.d $f12, ef_reusable_items
@@ -119,15 +134,18 @@ handle_food_waste:
 
     li $v0, 5
     syscall
-    move $t0, $v0
+    move $s0, $v0
 
-    li $t1, 1
-    beq $t0, $t1, food_none
-    li $t1, 2
-    beq $t0, $t1, food_moderate
-    li $t1, 3
-    beq $t0, $t1, food_significant
-    j invalid_input_msg
+    beq $s0, 1, food_none
+    beq $s0, 2, food_moderate
+    beq $s0, 3, food_significant
+    
+    # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
+    li $v0, 4                   # Print invalid input message
+    la $a0, invalid_user_input
+    syscall
+    
+    j handle_food_waste
 
 food_none:
     l.d $f12, ef_food_waste_none
@@ -149,15 +167,18 @@ handle_packaging_waste:
 
     li $v0, 5
     syscall
-    move $t0, $v0
+    move $s0, $v0
 
-    li $t1, 1
-    beq $t0, $t1, packaging_none
-    li $t1, 2
-    beq $t0, $t1, packaging_moderate
-    li $t1, 3
-    beq $t0, $t1, packaging_significant
-    j invalid_input_msg
+    beq $s0, 1, packaging_none
+    beq $s0, 2, packaging_moderate
+    beq $s0, 3, packaging_significant
+
+    # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
+    li $v0, 4                   # Print invalid input message
+    la $a0, invalid_user_input
+    syscall
+    
+    j handle_packaging_waste
 
 packaging_none:
     l.d $f12, ef_packaging_waste_none
@@ -171,6 +192,10 @@ packaging_significant:
     l.d $f12, ef_packaging_waste_significant
     jr $ra
 
+# preconditions: assumes that the $a, $t, $f registers have already been saved
+# postcondition: the total waste emission for the weekday is stored in $f0
+# Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
+# Purpose: Gives prompts and calculates the carbon emission of the weekend waste questions
 # Subroutine for personal waste habits
 handle_personal_waste:
     li $v0, 4
@@ -179,13 +204,17 @@ handle_personal_waste:
 
     li $v0, 5
     syscall
-    move $t0, $v0
+    move $s0, $v0
 
-    li $t1, 1
-    beq $t0, $t1, recycled
-    li $t1, 2
-    beq $t0, $t1, non_recycled
-    j invalid_input_msg
+    beq $s0, 1, recycled
+    beq $s0, 2, non_recycled
+    
+    # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
+    li $v0, 4                   # Print invalid input message
+    la $a0, invalid_user_input
+    syscall
+    
+    j handle_personal_waste
 
 recycled:
     l.d $f12, ef_recycled
@@ -194,10 +223,3 @@ recycled:
 non_recycled:
     l.d $f12, ef_non_recycled
     jr $ra
-
-# Invalid input handling
-invalid_input_msg:
-    li $v0, 4                   # Print invalid input message
-    la $a0, invalid_input
-    syscall
-    jr $ra                      # Return to caller

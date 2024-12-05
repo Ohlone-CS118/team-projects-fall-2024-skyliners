@@ -9,6 +9,9 @@
 
 # need to set buffer and file path in main
 readFromFile:
+	addiu $sp, $sp, -8       # Allocate space on the stack
+    	sw $ra, 4($sp)           # Save return address to main
+    	sw $t0, 0($sp)           # Save temporary register $t0
 	
 	move $s0, $a0		# store file path
 	move $s1, $a1		# store buffer
@@ -36,5 +39,7 @@ readFromFile:
 	move $a0, $s3		# set file handler
 	syscall
 	
-	jr $ra
-	 
+	lw $ra, 4($sp)           # Restore return address
+    	lw $t0, 0($sp)           # Restore $t0
+    	addiu $sp, $sp, 8        # Deallocate stack space
+    	jr $ra                   # Returning control to main
