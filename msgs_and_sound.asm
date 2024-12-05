@@ -1,0 +1,257 @@
+
+.text
+.globl msgs_and_sound
+# Preconditions: assumes that $a0 and $a1 have already been saved
+# This subroutine displays messages based on the user emission compared to the U.S. average and gives the appropriate message
+msgs:
+
+addiu $sp, $sp, -8       # Allocate space on the stack
+    	sw $ra, 4($sp)           # Save return address to main
+    	sw $t0, 0($sp)           # Save temporary register $t0
+l.d $f16, US_average		
+l.d $f14, half_average
+
+
+# Check if the projection is less than half of the average 
+	c.lt.d $f18, $f14  
+	bc1t less_than_half
+  
+	# Check if the projection is more than average 
+	c.lt.d $f16, $f18  
+	bc1t more_than  
+  
+	# If none of the conditions are true, then the projections is less than or equal to average but greater than or equal to half of the average  
+	j between_half_and_equal  
+  
+less_than_half:  
+   	# If projection is less than half of average
+   	
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+	
+   	li $v0, 4
+        la $a0, less_half_msg	# load less_half_msg string
+        syscall
+         
+        jal celebratory
+         
+   	j exit  
+  
+between_half_and_equal:  
+   	# Check if projection is equal to average  
+   	c.eq.d $f18, $f16  
+   	bc1t equal  
+  	
+  	# Check if the projection is exactly half of the average
+  	c.eq.d $f18, $f14  
+   	bc1t equal_half
+  
+   	# Code to handle the case where $f18 is less than $f16 but greater than half of $f16  
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+   	
+   	li $v0, 4
+        la $a0, half_and_equal_msg	# load half_and_equal_msg string
+        syscall
+        
+        jal less_celebratory 
+        
+   	j exit  
+   	
+equal_half:
+	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+
+  	li $v0, 4
+        la $a0, equal_half_msg	# load equal_half_msg string
+        syscall
+        
+        jal less_celebratory 
+        
+   	j exit  
+  
+equal:  
+   	# Code to handle the case where $f18 is equal to $f16
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+	
+   	li $v0, 4
+        la $a0, equal_msg	# load equal_msg string
+        syscall
+        
+	jal bad
+        
+   	j exit  
+  
+more_than:  
+   	# Code to handle the case where $f18 is more than $f16
+   	li $v0, 11		# Newline to seperate the msg from the rest of the results
+	la $a0, 10
+	syscall
+	
+   	li $v0, 4
+        la $a0, more_than_msg	# load more_than_msg string
+        syscall  
+        
+	jal bad
+ exit:
+ lw $ra, 4($sp)           # Restore return address
+    lw $t0, 0($sp)           # Restore $t0
+    addiu $sp, $sp, 8        # Deallocate stack space
+   $ra          # Return to main
+
+# Celebratory sound
+# $a0 and $v0 should be available       
+celebratory:  
+addiu $sp, $sp, -8       # Allocate space on the stack
+    	sw $ra, 4($sp)           # Save return address to main
+    	sw $t0, 0($sp)           # Save temporary register $t0
+	li $a0, 0     # Load piano  
+      	li $v0, 33  
+      	syscall 
+	
+      	li $a0, 72    # C5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+
+      	li $a0, 74    # D5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 76    # E5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 77    # F5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 79    # G5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+
+       lw $ra, 4($sp)           # Restore return address
+    lw $t0, 0($sp)           # Restore $t0
+    addiu $sp, $sp, 8        # Deallocate stack space
+    jr $ra                   # Return to msgs
+  
+# Less celebratory sound  
+# $a0 and $v0 should be available
+less_celebratory: 
+addiu $sp, $sp, -8       # Allocate space on the stack
+    	sw $ra, 4($sp)           # Save return address to main
+    	sw $t0, 0($sp)           # Save temporary register $t0
+	li $a0, 0     # Load piano  
+      	li $v0, 33  
+      	syscall 
+      	
+      	li $a0, 67    # G4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 69    # A4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 71    # B4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 72    # C5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 74    # D5  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall 
+      	 
+      	 lw $ra, 4($sp)           # Restore return address
+    lw $t0, 0($sp)           # Restore $t0
+    addiu $sp, $sp, 8        # Deallocate stack space
+    jr $ra                   # Return to msgs
+  
+# Bad sound 
+# $a0 and $v0 should be available 
+bad:  
+addiu $sp, $sp, -8       # Allocate space on the stack
+    	sw $ra, 4($sp)           # Save return address to main
+    	sw $t0, 0($sp)           # Save temporary register $t0
+     
+	li $a0, 0     # Load piano  
+      	li $v0, 33  
+      	syscall 
+      	
+      	li $a0, 60    # C4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 62    # D4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 64    # E4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 65    # F4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall  
+  
+      	li $a0, 67    # G4  
+      	li $v0, 31  
+      	syscall  
+      	li $a0, 500    # 500 milliseconds  
+      	li $v0, 32  
+      	syscall 
+      	 
+      	 lw $ra, 4($sp)           # Restore return address
+    lw $t0, 0($sp)           # Restore $t0
+    addiu $sp, $sp, 8        # Deallocate stack space
+    jr $ra                   # Return to msgs
+  
