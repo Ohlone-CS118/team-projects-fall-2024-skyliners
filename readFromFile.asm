@@ -6,8 +6,8 @@
 #	$a1=buffer
 # postcondition: 
 #	the buffer address holds the file .text
-
-# need to set buffer and file path in main
+# Contributors: Paul Raupach
+# Purpose: Reads from a file and puts in buffer
 readFromFile:
 	addiu $sp, $sp, -8       # Allocate space on the stack
     	sw $ra, 4($sp)           # Save return address to main
