@@ -72,6 +72,7 @@
 .globl ef_incandescent
 .globl ef_heater
 .globl ef_blanket
+.globl solar_factor
 
 #weekend energy
 .globl weekend_energy_main_question
@@ -173,7 +174,7 @@ invalid_user_input:	.asciiz "\nInvalid input! Please try again.\n"
 lunch_question: 	.asciiz "\n\nHow do you pack your lunch? (1-Reusable container, 2-Aluminum foil, 3-Plastic wrap, 4-Pre-packaged meal): "
 notes_question:		.asciiz "\nWhat do you use for notes? (1-Digital device, 2-Recycled paper, 3-Regular notebook): "
 waste_hours:		.asciiz "\nHow many hours do you use your digital device?(0-24): "
-waste_pages:		.asciiz "\nHow many pages do you use? (Enter a number greater or equal to 0): "
+waste_pages:		.asciiz "\nHow many pages(front and back) do you use? (Enter a number greater or equal to 0): "
 waste_invalid_hours_msg: 	.asciiz "\nInvalid input! Please enter a value between 0 and 24."
 waste_invalid_pages_msg: 	.asciiz "\nInvalid input! Please enter a value greater than 0."
 weekday_waste_result:		.asciiz "\nYour weekday waste emissions represented by black (kg CO2): "
@@ -242,6 +243,7 @@ ef_led: .double 0.01           # LED light bulb (kg CO2 per hour)
 ef_incandescent: .double 0.05  # Incandescent bulb (kg CO2 per hour)
 ef_heater: .double 1.5         # Heater (kg CO2 per hour)
 ef_blanket: .double 0.0        # Blanket (no emissions)
+solar_factor: .double 2.0      # Halfs the emission if has solar
 
 ef_reusable: .double 0.03
 ef_aluminum: .double 0.01

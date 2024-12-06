@@ -1,7 +1,7 @@
 .text
 .globl handle_weekend_energy
 # preconditions: assumes that the $a, and $f registers have already been saved
-# postcondition: the total energy emission for the weekday is stored in $f0
+# postcondition: the total energy emission for the weekdend is stored in $f0
 # Contributors: Emma. 12/02/2024(wrote the subroutine) - 12/04/2024(error checking)
 # Purpose: Gives prompts and calculates the carbon emission of the weekend energy questions
 handle_weekend_energy:
@@ -96,7 +96,7 @@ weekend_energy_invalid_minutes:
    	j weekend_energy_main				# Jump to ask the question again
    	
 end_weekend_energy:
-   	# Multiply by 2 for weekday total. Simplier than some of the other subroutines 
+   	# Multiply by 2 for weekday total. Simpler than some of the other subroutines 
    	li $s0, 2		# Load in 2 and convert to double to calculate the emission
     	mtc1 $s0, $f6
     	cvt.d.w $f6, $f6
