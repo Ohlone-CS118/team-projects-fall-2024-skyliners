@@ -274,14 +274,14 @@ ef_recycled: .double 1.0
 ef_non_recycled: .double 2.0
 
 # Text files. Different paths for ech person
-energy1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
-energy2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
-transport1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
-transport2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
-waste1:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
-waste2:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
-warning:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/warning.txt"
-feedback:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/feedback.txt"
+energy1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
+energy2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
+transport1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
+transport2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
+waste1:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
+waste2:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
+warning:	.asciiz "./team-projects-fall-2024-skyliners/text_files/warning.txt"
+feedback:	.asciiz "./team-projects-fall-2024-skyliners/text_files/feedback.txt"
 buffer:		.space 1024 
 
 # msgs_and_sound values

@@ -55,8 +55,8 @@ light_hours_prompt:
     syscall
     
     # If the user inputs an integer that's less than 0 or greater than 24, then the code will jump to invalid_hours since there's only 24 hours in a day(error checking).
-    blt $v0, 0, invalid_hours   # Check if input is below 0
-    bgt $v0, 24, invalid_hours  # Check if input is above 24
+    blt $v0, 0, invalid_light_hours   # Check if input is below 0
+    bgt $v0, 24, invalid_light_hours  # Check if input is above 24
     move $s2, $v0               # Save valid light usage hours
 
 heater_label:
@@ -75,10 +75,29 @@ heater_label:
     blt $s3, 1, invalid_heater
     bgt $s3, 2, invalid_heater
     
+    # if the user inputs heater
+    beq $s3, 1, heater_hours_prompt
+    
     # Calculate Light Bulb Emissions from light_hours_prompt after error checking.
     beq $s1, 1, use_led         # If LED
     beq $s1, 2, use_incandescent # If Incandescent
 
+heater_hours_prompt:
+	# Question 5: Heater Usage Hours (0-24)
+	# Asks the user how many hours they have their heater on per day so that we can do the hours times the emission factor for the heater part of the total emission.
+ 	li $v0, 4
+    	la $a0, heater_hours_question
+    	syscall
+    
+   	# Gets the hours as a word so that it's easier to check if the input is valid even though we'll have to convert it to a double later for the calculation
+    	li $v0, 5
+    	syscall
+    
+    	# If the user inputs an integer that's less than 0 or greater than 24, then the code will jump to invalid_hours since there's only 24 hours in a day(error checking).
+    	blt $v0, 0, invalid_heater_hours   # Check if input is below 0
+    	bgt $v0, 24, invalid_heater_hours  # Check if input is above 24
+    	move $s4, $v0               # Save valid heater usage hours
+    	
 use_led:
     # If the user said that they have LED light bulbs then we go here, load the emission factor, and sends it to the calculation label
     l.d $f0, ef_led             # Load LED emission factor
@@ -100,9 +119,12 @@ calculate_light_emissions:
     beq $s3, 2, use_blanket     # If Blanket
 
 use_heater:
+    mtc1 $s4, $f16               # Move hours to floating-point register
+    cvt.d.w $f16, $f16            # Convert hours to double
+
     # Loads the emission factor for if the user chose the heater for the calculations and jumps to the sum calculation label
     l.d $f0, ef_heater          # Load heater emission factor
-    mul.d $f8, $f0, $f4         # Total heater emissions = EF * hours
+    mul.d $f8, $f0, $f16         # Total heater emissions = EF * hours
     j sum_energy_emissions
 
 use_blanket:
@@ -133,13 +155,24 @@ invalid_heater:
     	syscall
     	
     	j heater_label
+
+
     	
-invalid_hours:
+    	
+invalid_light_hours:
     	# Tells the user that they entered an invalid input and send them back to enter the hours again(error checking).
     	li $v0, 4
     	la $a0, invalid_hours_msg   # Display invalid input message
     	syscall
     	j light_hours_prompt        # Retry the question
+
+
+invalid_heater_hours:
+    	# Tells the user that they entered an invalid input and send them back to enter the hours again(error checking).
+    	li $v0, 4
+    	la $a0, invalid_hours_msg   # Display invalid input message
+    	syscall
+    	j heater_hours_prompt        # Retry the question
 
 sum_energy_emissions:
 	# Checks if the user has solar because that affects the calculations
@@ -157,12 +190,12 @@ no_solar:
 	# The user does not have solar so the total energy emission for the weekday is just the light + heater/blanket
     	add.d $f10, $f6, $f8        # energy emissions = light + heater/blanket
     	j multiply_five
-    	
+
 multiply_five:
 
     # Multiply by 5 for weekday total
-    li $t4, 5
-    mtc1 $t4, $f4
+    li $s4, 5
+    mtc1 $s4, $f4
     cvt.d.w $f4, $f4
     mul.d $f0, $f10, $f4       # Weekly energy emissions
 
