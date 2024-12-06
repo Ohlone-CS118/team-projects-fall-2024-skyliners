@@ -68,7 +68,7 @@ get_waste_hours:
     	# Error checking
     	blt $v0, 0, waste_invalid_hours   # Check if input is below 0
     	bgt $v0, 24, waste_invalid_hours  # Check if input is above 24
-    	move $t2, $v0               	  # Save valid hours
+    	move $s2, $v0               	  # Save valid hours
     	
     	# If the hours entered are valid, then we can continue with the calculations
     	j waste_valid_hours 
@@ -85,11 +85,11 @@ get_waste_pages:
     	syscall
     	
     	blt $v0, 0, waste_invalid_hours   # Check if input is below 0
-    	move $t2, $v0               # Save valid page count
+    	move $s2, $v0               # Save valid page count
     	
     	# Since the flow would have gone to waste_invalid_hours if the user entered a negative number, we can now go to the calculations based on what the user entered
-    	beq $t1, 2, waste_valid_recycled_pages		# If choice = recycled paper then go to get_waste_pages
-    	beq $t1, 3, waste_valid_regular_pages		# If choice = regular paper then go to get_waste_pages
+    	beq $s1, 2, waste_valid_recycled_pages		# If choice = recycled paper then go to get_waste_pages
+    	beq $s1, 3, waste_valid_regular_pages		# If choice = regular paper then go to get_waste_pages
 
 waste_invalid_pages:
 	# If the user entered a negative number then the flow of the code goes here to tell them that they put in an invalid input and sends them back to the pages question(error checking)
@@ -110,7 +110,7 @@ waste_invalid_hours:
 waste_valid_hours:
 	# Loads in the emission factor and converts the hour word to a double for calculation, which is the emission for the question
 	l.d $f2, ef_digital_device
-	mtc1 $t2, $f4               # Move hours to floating-point register
+	mtc1 $s2, $f4               # Move hours to floating-point register
     	cvt.d.w $f4, $f4            # Convert hours to double
     	mul.d $f6, $f2, $f4         # Total digital device emissions = EF * hours
     	j end_handle_weekday_waste
@@ -118,7 +118,7 @@ waste_valid_hours:
 waste_valid_recycled_pages:
 	# Loads in the emission factor and converts the page word to a double for calculation, which is the emission for the question
 	l.d $f2, ef_recycled_paper
-	mtc1 $t2, $f4               # Move hours to floating-point register
+	mtc1 $s2, $f4               # Move hours to floating-point register
     	cvt.d.w $f4, $f4            # Convert hours to double
     	mul.d $f6, $f2, $f4         # Total recycled paper emissions = EF * pages
     	j end_handle_weekday_waste
@@ -126,7 +126,7 @@ waste_valid_recycled_pages:
 waste_valid_regular_pages:
 	# Loads in the emission factor and converts the page word to a double for calculation, which is the emission for the question
 	l.d $f2, ef_regular_notebook
-	mtc1 $t2, $f4               # Move hours to floating-point register
+	mtc1 $s2, $f4               # Move hours to floating-point register
     	cvt.d.w $f4, $f4            # Convert hours to double
     	mul.d $f6, $f2, $f4         # Total regular paper emissions = EF * pages
    	j end_handle_weekday_waste	
@@ -154,8 +154,8 @@ end_handle_weekday_waste:
     	add.d $f6, $f8, $f6	# add lunch emission and notes emission for the total emission of the day
     	
     	# multiply by 5 for all weekdays
-    	li $t4, 5
-    	mtc1 $t4, $f4
+    	li $s4, 5
+    	mtc1 $s4, $f4
     	cvt.d.w $f4, $f4
     	mul.d $f0, $f6, $f4       # Weekly waste emissions
     	
