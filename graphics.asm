@@ -1,3 +1,6 @@
+# Contributors: Andy. 12/02/2024(wrote the functions) - 12/03/2024(added more functions for weekend and total)
+# Purpose: These functions handle the display in the code.
+
 .globl drawBar
 .globl backgroundColor
 .globl draw_pixel
@@ -44,25 +47,25 @@ backgroundLoop:
 draw_pixel:
 	
 	addi $sp, $sp, -8		# make room on the stack for 2 words ($ra, $fp)
-	sw $fp, 4($sp)
-	addi $fp, $sp, 4	# move the $fp to the boginning of this stack frame
-	sw $ra, -4($fp)
+	sw $fp, 4($sp)		# store $fp on the stack
+	addi $fp, $sp, 4	# move the $fp to the beginning of this stack frame
+	sw $ra, -4($fp)		# store return address
 
-	la $s2, DISPLAY
-	lw $s2, 0($s2)
+	la $s2, DISPLAY		# load address of display label
+	lw $s2, 0($s2)		# load starting address of display in s2
 	
-	la $s1, WIDTH
-	lw $s1, 0($s1)
+	la $s1, WIDTH		# load address of width label
+	lw $s1, 0($s1)		# load width of display in s1
 
 	# $s1 = address = DISPLAY + 4 * (x + (y * WIDTH))
 	mul $s1, $a1, $s1	# s1 = (y * WIDTH)
 	add $s1, $s1, $a0	# (x + s1)
 	mul $s1, $s1, 4		# word (4 bytes)
-	sw $a2, 0x10000000($s1)
+	sw $a2, 0x10000000($s1)	# put a pixel into the display
 	
 
-	lw $ra, -4($fp)
-	lw $fp, 0($fp)
+	lw $ra, -4($fp)			# restore return address
+	lw $fp, 0($fp)			# restore frame pointer
 	addi $sp, $sp, 8		# pop off the stack
 
 	jr $ra
@@ -70,7 +73,7 @@ draw_pixel:
 
 
 
-
+# Purpose: Visualizes the user's emissions as bar graphs on the display.
 # draws vertical bars
 # preconditions
 #	$a0 = x (starting)
@@ -116,7 +119,7 @@ barExit:
 
 
 
-# Normalize weekday emissions to a height in the range 0-64
+# Purpose: Normalizes weekday emissions to a height in the range 0-64 for the display.
 # Preconditions:
 #   $f0 = emission value (in kg CO2)
 # Postconditions:
@@ -156,7 +159,7 @@ normalize_emission_weekday_resume:
     
     jr $ra
 
-    
+        # Checks if the bar overflows.
 normalize_emission_weekday_overflow:
 	mov.d $f28, $f26 # set the value 1 in f28
 	j normalize_emission_weekday_resume
@@ -165,7 +168,7 @@ normalize_emission_weekday_overflow:
 
 
 
-# Normalize weekend emissions to a height in the range 0-64
+# Purpose: Normalizes weekend emissions to a height in the range 0-64 for the display.
 # Preconditions:
 #   $f0 = emission value (in kg CO2)
 # Postconditions:
@@ -205,7 +208,7 @@ normalize_emission_weekend_resume:
     
     jr $ra
 
-    
+    # Checks if the bar overflows.
 normalize_emission_weekend_overflow:
 	mov.d $f28, $f26 # set the value 1 in f28
 	j normalize_emission_weekend_resume
@@ -216,7 +219,7 @@ normalize_emission_weekend_overflow:
 
 
 
-# Normalize total emissions to a height in the range 0-64
+# Purpose: Normalize total emissions to a height in the range 0-64 for the display.
 # Preconditions:
 #   $f0 = emission value (in kg CO2)
 # Postconditions:
@@ -256,7 +259,7 @@ normalize_emission_total_resume:
     
     jr $ra
 
-    
+        # Checks if the bar overflows.
 normalize_emission_total_overflow:
 	mov.d $f28, $f26 # set the value 1 in f28
 	j normalize_emission_total_resume
