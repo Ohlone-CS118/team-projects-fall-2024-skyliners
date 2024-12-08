@@ -273,15 +273,15 @@ ef_packaging_waste_significant: .double 6.0
 ef_recycled: .double 1.0
 ef_non_recycled: .double 2.0
 
-# Text files. Different paths for ech person
-energy1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
-energy2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
-transport1:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
-transport2:	.asciiz "./team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
-waste1:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
-waste2:		.asciiz "./team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
-warning:	.asciiz "./team-projects-fall-2024-skyliners/text_files/warning.txt"
-feedback:	.asciiz "./team-projects-fall-2024-skyliners/text_files/feedback.txt"
+# Text files. Different paths for each person
+energy1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact1.txt"
+energy2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/EnergyFact2.txt"
+transport1:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact1.txt"
+transport2:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/transportationFact2.txt"
+waste1:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact1.txt"
+waste2:		.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/WasteFact2.txt"
+warning:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/warning.txt"
+feedback:	.asciiz "C:/Users/keybl/OneDrive/Documents/CS 118/Labs/team-projects-fall-2024-skyliners/text_files/feedback.txt"
 buffer:		.space 1024 
 
 # msgs_and_sound values
@@ -300,15 +300,15 @@ half_average:		.double 8000
 
 main:
 # set the frame pointer to the beginning of the stack
-    	move $fp, $sp       
-    
+    	move $fp, $sp   	# Set the frame pointer to the stack pointer
+    	
     	la $a0, warning		# set path
     	la $a1, buffer		# set buffer
     	jal readFromFile
     
     	li $v0, 4
     	la $a0, buffer
-	syscall
+	syscall   	
 	
 	li $v0, 11		# Newline to seperate the warning from the rest of the code
 	la $a0, 10
@@ -317,7 +317,6 @@ main:
 	li $v0, 11		# Newline to seperate the warning from the rest of the code
 	la $a0, 10
 	syscall
-    
     
 	la $a0, WHITE		# set white as the background color
 	lw $a0, 0($a0)		
