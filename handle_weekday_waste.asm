@@ -1,14 +1,17 @@
 .text
 
 .globl handle_weekday_waste
-# preconditions: assumes that the $a, and $f registers have already been saved
+# preconditions: assumes that the $a and $f registers have already been saved
 # postcondition: the total energy emission for the weekday is stored in $f0
 # Contributors: Emma. 12/02/2024(wrote the subroutine) - 12/04/2024(error checking)
 # Purpose: Gives prompts and calculates the carbon emission of the weekday energy questions
 handle_weekday_waste:
-	addiu $sp, $sp, -8       # Allocate stack space
-    	sw $ra, 4($sp)           # Save return address
-    	sw $t0, 0($sp)           # Save temporary register $t0
+	# Set up stack
+    	addiu $sp, $sp, -8     	# Allocate stack space  
+    	sw $ra, 4($sp)        	# Save return address  
+    	sw $fp, 0($sp)        	# stash the frame pointer  
+    	addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
+
     	
 ask_lunch_question: 	
 	# Asks the lunch question and gets the user choice for calculations
@@ -16,15 +19,15 @@ ask_lunch_question:
     	la $a0, lunch_question
     	syscall
 
+	# Gets the user's choice as an integer because it's just used for branching
     	li $v0, 5
     	syscall
-    	move $s1, $v0		# Save lunch choice (Reusable, aluminum, plastic, pre-packaged)
     	
     	# Goes to the appropriate label based on user choice
-	beq $s1, 1, get_reusable_ef
-	beq $s1, 2, get_aluminum_ef
-	beq $s1, 3, get_plastic_ef
-	beq $s1, 4, get_pre_packaged_ef
+	beq $v0, 1, get_reusable_ef
+	beq $v0, 2, get_aluminum_ef
+	beq $v0, 3, get_plastic_ef
+	beq $v0, 4, get_pre_packaged_ef
 	
 	# If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
 	li $v0, 4
@@ -41,7 +44,7 @@ ask_notes_question:
 
     	li $v0, 5
     	syscall
-    	move $s1, $v0            # Save notes choice (Digital device, Recycled paper, Regular notebook
+    	move $s1, $v0            # Save notes choice (Digital device, Recycled paper, Regular notebook). Need to save the choice because get_waste_pages also has a branch based on $s1.
     	
    	# Goes to the appropriate label based on user choice
     	beq $s1, 1, get_waste_hours		# If choice = digital device then go to get_waste_hours
@@ -61,7 +64,7 @@ get_waste_hours:
     	la $a0, waste_hours
     	syscall
     	
-    	# Get user input as a word so that the error check is more simple even though we convert it to a double for calculations later
+    	# Get user input as an integer so that the error check is more simple even though we convert it to a double for calculations later
     	li $v0, 5
     	syscall
     	
@@ -132,21 +135,22 @@ waste_valid_regular_pages:
    	j end_handle_weekday_waste	
 	
 get_reusable_ef: 
+	# Loads the emission factor, which is the only emission calculation for the lunch question, and jumps to the next question.
 	l.d $f8, ef_reusable
 	j ask_notes_question
 	
 get_aluminum_ef:
-	# Loads the emission factor which is the only emission calculation for the lunch question
+	# Loads the emission factor, which is the only emission calculation for the lunch question, and jumps to the next question.
 	l.d $f8, ef_aluminum
 	j ask_notes_question
 		
 get_plastic_ef:
-	# Loads the emission factor which is the only emission calculation for the lunch question
+	# Loads the emission factor, which is the only emission calculation for the lunch question, and jumps to the next question.
 	l.d $f8, ef_plastic
 	j ask_notes_question
 	
 get_pre_packaged_ef:
-	# Loads the emission factor which is the only emission calculation for the lunch question
+	# Loads the emission factor, which is the only emission calculation for the lunch question, and jumps to the next question.
 	l.d $f8, ef_pre_packaged
 	j ask_notes_question
 
@@ -168,8 +172,8 @@ end_handle_weekday_waste:
     	mov.d $f12, $f0          # Load emissions for printing
     	syscall
     	
-    	# Cleanup
-    	lw $ra, 4($sp)              # Restore return address
-    	lw $t0, 0($sp)              # Restore $t0
-    	addiu $sp, $sp, 8           # Deallocate stack space
-    	jr $ra                      # Return to main
+    	# Restore stack
+    	lw $fp, 0($sp)        	# Restore frame pointer  
+    	lw $ra, 4($sp)        	# Restore return address  
+    	addiu $sp, $sp, 8      	# Deallocate stack space 
+    	jr $ra             		# Return to caller

@@ -5,16 +5,19 @@
 # Contributors: Emma. 12/02/2024(wrote the subroutine) - 12/04/2024(error checking)
 # Purpose: Gives prompts and calculates the carbon emission of the weekend energy questions
 handle_weekend_energy:
-    	addiu $sp, $sp, -8       # Allocate stack space
-    	sw $ra, 4($sp)           # Save return address
-   	sw $t0, 0($sp)           # Save temporary register $t0
+	
+    	addiu $sp, $sp, -8     	# Allocate stack space  
+	sw $ra, 4($sp)        	# Save return address  
+	sw $fp, 0($sp)        	# stash the frame pointer  
+	addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
    	
 weekend_energy_main:
+	# Asks the user the main question for the weekend energy part
    	li $v0, 4				# Print the main question question
     	la $a0, weekend_energy_main_question
     	syscall
 
-    	li $v0, 5				# Get the user input as an integer to know where to go
+    	li $v0, 5				# Get the user input as an integer to know where to go and to make branching easier
     	syscall
     	
     	# Goes to the appropriate label based on user choice
@@ -30,53 +33,69 @@ weekend_energy_main:
     	j weekend_energy_main
 	
 calculate_TV:
+	# Calculates the emission if the user chose to watch TV
 	li $v0, 4				# Print the hours used question
     	la $a0, weekend_energy_hours_question
     	syscall
     	
     	li $v0, 7				# Get the user input in double for calculation
     	syscall
+    	mov.d $f2, $f0           		# Save hours in $f2. Needed for the emission calculation
     	
      	# Error checks to make sure the hours entered is within a day(24 hours)
-    	bltz $v0, weekend_energy_invalid_hours		# Make sure the hours entered is vaild
-    	bgt $v0, 24, weekend_energy_invalid_hours	# Make sure the hours entered is valid
+     	l.d $f0, zero_value      # load zero value
+	c.lt.d $f2, $f0		# check if hours < 0
+	bc1t weekend_energy_invalid_hours
+	l.d $f0, hours_day
+	c.lt.d $f0, $f2		# check if 24 < hours
+	bc1t weekend_energy_invalid_hours
     	
     	# Calculates the emission
-    	l.d $f2, ef_movie				# Load the emission factor for watching TV and convert the hours watched into double
-    	mul.d $f4, $f0, $f2				# Emission = EF * hours 
+    	l.d $f4, ef_movie				# Load the emission factor for watching TV and convert the hours watched into double
+    	mul.d $f4, $f4, $f2				# Emission = EF * hours 
    	j end_weekend_energy				# Go to the end of the function
     	
 calculate_Gaming:
+	# Calculates the emission if the user chose to game
 	li $v0, 4					# Print the hours used question
     	la $a0, weekend_energy_hours_question
     	syscall
     	
     	li $v0, 7					# Get the user input as a double for calculation
     	syscall
+    	mov.d $f2, $f0
  
-     	# Error checks to make sure the hours entered is within a day(24 hours)    	   	
-    	bltz $v0, weekend_energy_invalid_hours		# Make sure the hours entered is vaild
-    	bgt $v0, 24, weekend_energy_invalid_hours	# Make sure the hours entered is vaild
+     	# Error checks to make sure the hours entered is within a day(24 hours)
+     	l.d $f0, zero_value      # load zero value
+	c.lt.d $f2, $f0		# check if hours < 0
+	bc1t weekend_energy_invalid_hours
+	l.d $f0, hours_day
+	c.lt.d $f0, $f2		# check if 24 < hours
+	bc1t weekend_energy_invalid_hours
 
     	# Calculates the emission    	
-    	l.d $f2, ef_gaming				# Load the emission factor for playing on a gaming system and convert the hours played into a double
-    	mul.d $f4, $f0, $f2				# Emission = EF * hours
+    	l.d $f4, ef_gaming				# Load the emission factor for playing on a gaming system and convert the hours played into a double
+    	mul.d $f4, $f4, $f2				# Emission = EF * hours
    	j end_weekend_energy   				# Go to the end of the function
     	 				
 calculate_Baking:
+	# Calculates the emission if the user chose to bake
 	li $v0, 4					# Print the minutes used question
     	la $a0, weekend_energy_baking_minutes
     	syscall
     	
     	li $v0, 7					# Get the user input as a double for calculation
     	syscall
+    	mov.d $f2, $f0
     	
     	# Error checking
-    	bltz $v0, weekend_energy_invalid_minutes	# Make sure the minutes entered is vaild
+    	l.d $f0, zero_value      # load zero value
+	c.lt.d $f2, $f0		# check if minutes < 0
+	bc1t weekend_energy_invalid_minutes
     	
     	# Calculates the emission    	
-	l.d $f2, ef_baking				# Load the emission factor for baking and convert the minutes into a double
-    	mul.d $f4, $f0, $f2				# Emission = EF * minutes
+	l.d $f4, ef_baking				# Load the emission factor for baking and convert the minutes into a double
+    	mul.d $f4, $f4, $f2				# Emission = EF * minutes
    	j end_weekend_energy				# Jump to the end of the function
    	
 weekend_energy_invalid_hours:
@@ -112,8 +131,8 @@ end_weekend_energy:
     	syscall
    	
    	# Cleanup
-    	lw $ra, 4($sp)              # Restore return address
-    	lw $t0, 0($sp)              # Restore $t0
-    	addiu $sp, $sp, 8           # Deallocate stack space
-    	jr $ra                      # Return to main
+   	lw $fp, 0($sp)        	# Restore frame pointer  
+	lw $ra, 4($sp)        	# Restore return address  
+	addiu $sp, $sp, 8      	# Deallocate stack space  
+	jr $ra             	# Return to caller
  

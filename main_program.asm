@@ -58,6 +58,7 @@
 .globl ef_car
 .globl ef_carpool
 .globl zero_value
+.globl hours_day
 
 #weekday energy
 .globl solar_question
@@ -244,6 +245,7 @@ ef_incandescent: .double 0.05  # Incandescent bulb (kg CO2 per hour)
 ef_heater: .double 1.5         # Heater (kg CO2 per hour)
 ef_blanket: .double 0.0        # Blanket (no emissions)
 solar_factor: .double 2.0      # Halfs the emission if has solar
+hours_day: .double 24.0
 
 ef_reusable: .double 0.03
 ef_aluminum: .double 0.01
@@ -387,9 +389,6 @@ main:
     
     
     	mov.d $f24, $f0		# Store the weekday transportation in $f24 for a running total
-
-    	# Display weekday transportation emissions
-    	jal display_weekday_transportation_emissions
  
        mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
            # Normalize total emissions for weekdays
@@ -437,9 +436,6 @@ main:
 	
     	jal handle_weekday_energy
     	add.d $f24, $f24, $f0	# Store the weekday energy in $f24 for a running total
-    
-    # Display weekday energy emissions
-    	jal display_weekday_energy_emissions
     
        # Normalize emissions for calculated weekday energy
 	jal normalize_emission_weekday  # Normalize the emission value in $f0
@@ -736,8 +732,6 @@ main:
 	
     	jal handle_weekend_waste
     	add.d $f24, $f24, $f0	# Store the weekend energy in $f24 for a running total
-# Display weekend transportation emissions
-    	jal display_weekend_waste_emissions
 
  # Normalize emissions for calculated weekend waste
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
@@ -888,60 +882,3 @@ main:
     	# Exit program
     	li $v0, 10
     	syscall
-
-
-
-# Display the weekday transportation emissions
-display_weekday_transportation_emissions:
-    	addiu $sp, $sp, -4       # Allocate space on the stack
-    	sw $ra, 0($sp)           # Save return address
-
-    	li $v0, 4
-    	la $a0, weekday_transportation_result
-    	syscall
-
-    	li $v0, 3
-    	mov.d $f12, $f0          # Load emissions for printing
-    	syscall
-
-    	lw $ra, 0($sp)           # Restore return address
-    	addiu $sp, $sp, 4        # Deallocate stack space
-    	jr $ra                   # Returning control to main
-    
-    # Display the weekday transportation emissions
-display_weekday_energy_emissions:
-    	addiu $sp, $sp, -4       # Allocate space on the stack
-    	sw $ra, 0($sp)           # Save return address
-
-    	li $v0, 4
-    	la $a0, weekday_energy_result
-   	syscall
-
-    	li $v0, 3
-    	mov.d $f12, $f0          # Load emissions for printing
-    	syscall
-
-    	lw $ra, 0($sp)           # Restore return address
-    	addiu $sp, $sp, 4        # Deallocate stack space
-    	jr $ra                   # Returning control to main
-
-# Display the weekend waste emissions
-display_weekend_waste_emissions:
-    	addiu $sp, $sp, -4       # Allocate space on the stack
-    	sw $ra, 0($sp)           # Save return address
-    
-    	li $v0, 4
-    	la $a0, weekend_waste_result
-    	syscall
-
-    	li $v0, 3
-    	mov.d $f12, $f0          # Load emissions for printing
-    	syscall
-
-    	lw $ra, 0($sp)           # Restore return address
-    	addiu $sp, $sp, 4        # Deallocate stack space
-    	jr $ra                   # Returning control to main   
-    
-
-
-

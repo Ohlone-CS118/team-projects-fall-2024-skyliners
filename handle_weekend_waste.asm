@@ -2,15 +2,16 @@
 
 .text
 .globl handle_weekend_waste
-# preconditions: assumes that the $a, $t, $f registers have already been saved
+# preconditions: assumes that the $a and $f registers have already been saved
 # postcondition: the total waste emission for the weekday is stored in $f0
 # Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
 # Purpose: Calculates the carbon emission of the weekend waste questions
 handle_weekend_waste:
     # Set up stack
-    addiu $sp, $sp, -8           # Allocate stack space
-    sw $ra, 4($sp)               # Save return address
-    sw $t0, 0($sp)               # Save $t0
+    addiu $sp, $sp, -8     	# Allocate stack space  
+    sw $ra, 4($sp)        	# Save return address  
+    sw $fp, 0($sp)        	# stash the frame pointer  
+    addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
 
     # Handle grocery bag emissions
     jal handle_bag_emission
@@ -43,31 +44,47 @@ handle_weekend_waste:
     mtc1 $s1, $f0                # Move $t1 into floating-point register $f0
     cvt.d.w $f0, $f0             # Convert $f0 to double
     mul.d $f0, $f12, $f0        # Multiply total emissions by 2
+    
+    # Prints the weekend waste results
+    li $v0, 4
+    la $a0, weekend_waste_result
+    syscall
+
+    li $v0, 3
+    mov.d $f12, $f0          # Load emissions for printing
+    syscall
 
     # Restore stack
-    lw $ra, 4($sp)               # Restore return address
-    lw $t0, 0($sp)               # Restore $t0
-    addiu $sp, $sp, 8            # Deallocate stack space
+    lw $fp, 0($sp)        	# Restore frame pointer  
+    lw $ra, 4($sp)        	# Restore return address  
+    addiu $sp, $sp, 8      	# Deallocate stack space 
+    jr $ra             		# Return to caller
 
-    jr $ra
-
-# preconditions: assumes that the $a, $t, $f registers have already been saved
-# postcondition: the total waste emission for the weekday is stored in $f0
+# preconditions: assumes that the $a and $f registers have already been saved
+# postcondition: the waste emission for the question is stored in $f12
 # Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
 # Purpose: Gives prompts and calculates the carbon emission of the bag question
 # Subroutine for grocery bag emissions
 handle_bag_emission:
+    # Set up stack
+    addiu $sp, $sp, -8     	# Allocate stack space  
+    sw $ra, 4($sp)        	# Save return address  
+    sw $fp, 0($sp)        	# stash the frame pointer  
+    addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
+    
+    # Asks the user what kind of bag they use for shopping
     li $v0, 4
     la $a0, bag_question
     syscall
-
+    
+    # Gets the user input as an integer so that the branching is easier 
     li $v0, 5
     syscall
-    move $s0, $v0
 
-    beq $s0, 1, bag_reusable
-    beq $s0, 2, bag_paper
-    beq $s0, 3, bag_plastic
+    # Goes to get the emission factor based on the user's choice
+    beq $v0, 1, bag_reusable
+    beq $v0, 2, bag_paper
+    beq $v0, 3, bag_plastic
     
     # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
     li $v0, 4                   # Print invalid input message
@@ -77,35 +94,53 @@ handle_bag_emission:
     j handle_bag_emission
 
 bag_reusable:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_reusable_bag
-    jr $ra
+    j end_bag
 
 bag_paper:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_paper_bag
-    jr $ra
+    j end_bag
 
 bag_plastic:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_plastic_bag
-    jr $ra
+    j end_bag
+    
+end_bag:
+    # Restore stack
+    lw $fp, 0($sp)        	# Restore frame pointer  
+    lw $ra, 4($sp)        	# Restore return address  
+    addiu $sp, $sp, 8      	# Deallocate stack space 
+    jr $ra             		# Return to caller
+    
 
-# preconditions: assumes that the $a, $t, $f registers have already been saved
-# postcondition: the total waste emission for the weekday is stored in $f0
+# preconditions: assumes that the $a and $f registers have already been saved
+# postcondition: the waste emission for the question is stored in $f12
 # Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
-# Purpose: Gives prompts and calculates the carbon emission of the weekend waste questions
+# Purpose: Gives prompts and calculates the carbon emission of the gathering question
 # Subroutine for gathering emissions
 handle_gathering_emission:
+    # Set up stack
+    addiu $sp, $sp, -8     	# Allocate stack space  
+    sw $ra, 4($sp)        	# Save return address  
+    sw $fp, 0($sp)        	# stash the frame pointer  
+    addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
+ 
+    # Asks the user what they use at gatherings
     li $v0, 4
     la $a0, gathering_question
     syscall
 
+    # Gets the user input as an integer so that the branching is easier 
     li $v0, 5
     syscall
-    move $s0, $v0
-
-
-    beq $s0, 1, gathering_reusable
-    beq $s0, 2, gathering_mixed
-    beq $s0, 3, gathering_disposable
+    
+    # Goes to get the emission factor based on the user's choice
+    beq $v0, 1, gathering_reusable
+    beq $v0, 2, gathering_mixed
+    beq $v0, 3, gathering_disposable
 
     # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
     li $v0, 4                   # Print invalid input message
@@ -115,30 +150,52 @@ handle_gathering_emission:
     j handle_gathering_emission
 
 gathering_reusable:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_reusable_items
-    jr $ra
-
+    j end_gathering 
+    
 gathering_mixed:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_mixed_items
-    jr $ra
+    j end_gathering 
 
 gathering_disposable:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_disposable_items
-    jr $ra
+    j end_gathering 
+    
+end_gathering:    
+    # Restore stack
+    lw $fp, 0($sp)        	# Restore frame pointer  
+    lw $ra, 4($sp)        	# Restore return address  
+    addiu $sp, $sp, 8      	# Deallocate stack space 
+    jr $ra             		# Return to caller
 
+# preconditions: assumes that the $a and $f registers have already been saved
+# postcondition: the waste emission for the question is stored in $f12
+# Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
+# Purpose: Gives prompts and calculates the carbon emission of the food waste question
 # Subroutine for food waste
 handle_food_waste:
+    # Set up stack
+    addiu $sp, $sp, -8     	# Allocate stack space  
+    sw $ra, 4($sp)        	# Save return address  
+    sw $fp, 0($sp)        	# stash the frame pointer  
+    addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
+    
+    # Asks the user how much food waste they produce
     li $v0, 4
     la $a0, food_waste_question
     syscall
 
+    # Gets the user input as an integer so that the branching is easier 
     li $v0, 5
     syscall
-    move $s0, $v0
-
-    beq $s0, 1, food_none
-    beq $s0, 2, food_moderate
-    beq $s0, 3, food_significant
+    
+    # Goes to get the emission factor based on the user's choice
+    beq $v0, 1, food_none
+    beq $v0, 2, food_moderate
+    beq $v0, 3, food_significant
     
     # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
     li $v0, 4                   # Print invalid input message
@@ -148,30 +205,52 @@ handle_food_waste:
     j handle_food_waste
 
 food_none:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_food_waste_none
-    jr $ra
+    j food_waste_end
 
 food_moderate:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_food_waste_moderate
-    jr $ra
+    j food_waste_end
 
 food_significant:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_food_waste_significant
-    jr $ra
+    j food_waste_end
 
+food_waste_end:    
+    # Restore stack
+    lw $fp, 0($sp)        	# Restore frame pointer  
+    lw $ra, 4($sp)        	# Restore return address  
+    addiu $sp, $sp, 8      	# Deallocate stack space 
+    jr $ra             		# Return to caller
+
+# preconditions: assumes that the $a and $f registers have already been saved
+# postcondition: the waste emission for the question is stored in $f12
+# Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
+# Purpose: Gives prompts and calculates the carbon emission of the packaging waste question
 # Subroutine for packaging waste
 handle_packaging_waste:
+    # Set up stack
+    addiu $sp, $sp, -8     	# Allocate stack space  
+    sw $ra, 4($sp)        	# Save return address  
+    sw $fp, 0($sp)        	# stash the frame pointer  
+    addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
+    
+    # Asks the user how much packaging waste they produce
     li $v0, 4
     la $a0, packaging_waste_question
     syscall
 
+    # Gets the user input as an integer so that the branching is easier 
     li $v0, 5
     syscall
-    move $s0, $v0
 
-    beq $s0, 1, packaging_none
-    beq $s0, 2, packaging_moderate
-    beq $s0, 3, packaging_significant
+    # Goes to get the emission factor based on the user's choice
+    beq $v0, 1, packaging_none
+    beq $v0, 2, packaging_moderate
+    beq $v0, 3, packaging_significant
 
     # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
     li $v0, 4                   # Print invalid input message
@@ -181,33 +260,51 @@ handle_packaging_waste:
     j handle_packaging_waste
 
 packaging_none:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_packaging_waste_none
-    jr $ra
+    j packaging_end
 
 packaging_moderate:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_packaging_waste_moderate
-    jr $ra
+    j packaging_end
 
 packaging_significant:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_packaging_waste_significant
-    jr $ra
+    j packaging_end
+    
+packaging_end:    
+    # Restore stack
+    lw $fp, 0($sp)        	# Restore frame pointer  
+    lw $ra, 4($sp)        	# Restore return address  
+    addiu $sp, $sp, 8      	# Deallocate stack space 
+    jr $ra             		# Return to caller
 
 # preconditions: assumes that the $a, $t, $f registers have already been saved
 # postcondition: the total waste emission for the weekday is stored in $f0
 # Contributors: Ni Linn(Wrote subroutine) and Emma(error checking). 12/03/2024(wrote the subroutine) - 12/04/2024(error checking)
-# Purpose: Gives prompts and calculates the carbon emission of the weekend waste questions
+# Purpose: Gives prompts and calculates the carbon emission of the personal waste habits question
 # Subroutine for personal waste habits
 handle_personal_waste:
+    # Set up stack
+    addiu $sp, $sp, -8     	# Allocate stack space  
+    sw $ra, 4($sp)        	# Save return address  
+    sw $fp, 0($sp)        	# stash the frame pointer  
+    addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
+    
+    # Asks the user what their personal waste habits are
     li $v0, 4
     la $a0, personal_waste_question
     syscall
 
+    # Gets the user input as an integer so that the branching is easier 
     li $v0, 5
     syscall
-    move $s0, $v0
 
-    beq $s0, 1, recycled
-    beq $s0, 2, non_recycled
+    # Goes to get the emission factor based on the user's choice
+    beq $v0, 1, recycled
+    beq $v0, 2, non_recycled
     
     # If user inputs something other than one of the choices it says that the choice is invaild and jumps back to the question(error checking).
     li $v0, 4                   # Print invalid input message
@@ -217,9 +314,18 @@ handle_personal_waste:
     j handle_personal_waste
 
 recycled:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_recycled
-    jr $ra
+    j personal_waste_end
 
 non_recycled:
+    # Gets the emission factor for the user's choice
     l.d $f12, ef_non_recycled
-    jr $ra
+    j personal_waste_end
+    
+personal_waste_end:    
+    # Restore stack
+    lw $fp, 0($sp)        	# Restore frame pointer  
+    lw $ra, 4($sp)        	# Restore return address  
+    addiu $sp, $sp, 8      	# Deallocate stack space 
+    jr $ra             		# Return to caller

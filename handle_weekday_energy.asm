@@ -4,14 +4,16 @@
 .text
 .globl handle_weekday_energy
 
-# preconditions: assumes that the $a, $t, $f registers have already been saved
+# preconditions: assumes that the $a and $f registers have already been saved
 # postcondition: the total energy emission for the weekday is stored in $f0
 # Contributors: Ni Linn(Wrote the subroutine) and Emma(error checking). 12/02/2024(wrote the subroutine) - 12/04/2024(error checking)
 # Purpose: Gives prompts and calculates the carbon emission of the weekday energy questions
 handle_weekday_energy:
-    addiu $sp, $sp, -8       # Allocate stack space
-    sw $ra, 4($sp)           # Save return address
-    sw $t0, 0($sp)           # Save temporary register $t0
+    # Set up stack
+    addiu $sp, $sp, -8     	# Allocate stack space  
+    sw $ra, 4($sp)        	# Save return address  
+    sw $fp, 0($sp)        	# stash the frame pointer  
+    addi $fp, $sp, 4      	# set the frame pointer the beginning of the stack
 
 solar_label:
     # Question 1: Solar Panels
@@ -20,6 +22,7 @@ solar_label:
     la $a0, solar_question
     syscall
 
+    # Gets the user input as an integer so that the branching is easier 
     li $v0, 5
     syscall
     move $s0, $v0            # Save solar panel choice
@@ -35,9 +38,10 @@ light_bulb_label:
     la $a0, bulb_question
     syscall
 
+    # Gets the user input as an integer so that the branching is easier 
     li $v0, 5
     syscall
-    move $s1, $v0            # Save light bulb type 
+    move $s1, $v0            # Save light bulb type. Need to save for later calculations.
     
     # If the user inputs something other than 1 or 2, then the code goes to the invalid_light label(error checking). We don't jump anywhere else because this is just a flag to know which emission factor to load.
     blt $s1, 1, invalid_light
@@ -53,11 +57,11 @@ light_hours_prompt:
     # Gets the hours as a word so that it's easier to check if the input is valid even though we'll have to convert it to a double later for the calculation
     li $v0, 5
     syscall
+    move $s2, $v0               # Save valid light usage hours. Need to save for later calculations.
     
     # If the user inputs an integer that's less than 0 or greater than 24, then the code will jump to invalid_hours since there's only 24 hours in a day(error checking).
-    blt $v0, 0, invalid_light_hours   # Check if input is below 0
-    bgt $v0, 24, invalid_light_hours  # Check if input is above 24
-    move $s2, $v0               # Save valid light usage hours
+    blt $s2, 0, invalid_light_hours   # Check if input is below 0
+    bgt $s2, 24, invalid_light_hours  # Check if input is above 24
 
 heater_label:
     # Question 4: Heater or Blanket
@@ -69,9 +73,9 @@ heater_label:
     # Gets the user choice 
     li $v0, 5
     syscall
-    move $s3, $v0               # Save heating choice
+    move $s3, $v0               # Save heating choice. Need to save for later calculation.
     
-    # If the user inputs anything other thn 1 or 2 then the code jumps to invalid_heater(error checking). We don't jump anywhere else because this is just a flag to know which emission factor to load.
+    # If the user inputs anything other thn 1 or 2 then the code jumps to invalid_heater(error checking).
     blt $s3, 1, invalid_heater
     bgt $s3, 2, invalid_heater
     
@@ -154,10 +158,7 @@ invalid_heater:
     	la $a0, invalid_user_input
     	syscall
     	
-    	j heater_label
-
-
-    	
+    	j heater_label    	
     	
 invalid_light_hours:
     	# Tells the user that they entered an invalid input and send them back to enter the hours again(error checking).
@@ -198,9 +199,18 @@ multiply_five:
     mtc1 $s4, $f4
     cvt.d.w $f4, $f4
     mul.d $f0, $f10, $f4       # Weekly energy emissions
+    
+    # Prints the weekday energy results
+    li $v0, 4
+    la $a0, weekday_energy_result
+    syscall
 
-    # Cleanup
-    lw $ra, 4($sp)              # Restore return address
-    lw $t0, 0($sp)              # Restore $t0
-    addiu $sp, $sp, 8           # Deallocate stack space
-    jr $ra                      # Return to main
+    li $v0, 3
+    mov.d $f12, $f0          # Load emissions for printing
+    syscall
+
+    # Restore stack
+    lw $fp, 0($sp)        	# Restore frame pointer  
+    lw $ra, 4($sp)        	# Restore return address  
+    addiu $sp, $sp, 8      	# Deallocate stack space 
+    jr $ra             		# Return to caller
