@@ -3,6 +3,3 @@ Solar Energy: Solar power has also grown significantly. The total installed glob
 emissions annually.
 Hydropower: Contributes about 16% of global electricity generation, producing nearly zero CO2 emissions during operation. 
 However, the environmental impact of dam construction and ecosystem disruption can have other environmental consequences.
-
-Rehman, Abdul, et al. Globalization and Renewable Energy Use: How Are They Contributing to Upsurge the CO2 Emissions? A Global Perspective.
-Environmental Science and Pollution Research International, vol. 30, no. 4, 2023, pp. 9699–712, https://doi.org/10.1007/s11356-022-22775-6.
