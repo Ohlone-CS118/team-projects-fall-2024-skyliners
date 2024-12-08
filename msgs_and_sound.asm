@@ -107,50 +107,78 @@ exit:
 # Celebratory sound
 # $a0 and $v0 should be available   
 # Contributors: Emma(wrote code but used wrong registers) and Andy(fixed the registers). 12/04/2024
+# 12/08/2024 - Changed sound by Andy.
 # Purpose: To output a sound based on the calculated comparison from the msgs subroutine.
 celebratory:  
 	addiu $sp, $sp, -8       # Allocate space on the stack
     	sw $ra, 4($sp)           # Save return address to main
     	sw $t0, 0($sp)           # Save temporary register $t0
     	
-	li $a0, 0     # Load piano  
+	li $a2, 0     # Load piano  
       	li $v0, 33  
-      	syscall 
+      	 
 	
       	li $a0, 72    # C5  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+	li $a1, 125    # 125 milliseconds  
       	syscall  
 
-      	li $a0, 74    # D5  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+      	li $a0, 72    # C5    
+      	li $a1, 125    # 125 milliseconds  
       	syscall  
   
-      	li $a0, 76    # E5  
-      	li $v0, 31  
+      	li $a0, 72    # C5  
+      	li $a1, 125    # 125 milliseconds  
       	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+
+      	li $a0, 72    # C5  
+      	li $a1, 250    # 250 milliseconds  
       	syscall  
-  
-      	li $a0, 77    # F5  
-      	li $v0, 31  
+
+	li $v0, 32	
+	li $a0, 250	# rest for 250 milliseconds
+	syscall
+
+
+	li $v0, 33
+      	li $a0, 68    # G♯4  
+      	li $a1, 250    # 250 milliseconds  
       	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+
+	li $v0, 32	
+	li $a0, 250	# rest for 250 milliseconds
+	syscall
+	
+	li $v0, 33
+      	li $a0, 70    # A♯4  
+      	li $a1, 250    # 250 milliseconds  
       	syscall  
-  
-      	li $a0, 79    # G5  
-      	li $v0, 31  
+
+	li $v0, 32	
+	li $a0, 250	# rest for 250 milliseconds
+	syscall
+
+	li $v0, 33
+      	li $a0, 72    # C5  
+      	li $a1, 250    # 250 milliseconds  
       	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+      	
+      	li $v0, 32	
+	li $a0, 50	# rest for 50 milliseconds
+	syscall
+
+
+	li $v0, 33
+      	li $a0, 70    # A♯4  
+      	li $a1, 125    # 125 milliseconds  
       	syscall  
+
+
+      	li $a0, 72    # C5  
+      	li $a1, 1000    # 1 second  
+      	syscall  
+
+
+
 
        	lw $ra, 4($sp)           # Restore return address
     	lw $t0, 0($sp)           # Restore $t0
@@ -160,49 +188,27 @@ celebratory:
 # Less celebratory sound  
 # $a0 and $v0 should be available
 # Contributors: Emma(wrote code but used wrong registers) and Andy(fixed the registers). 12/04/2024
+# 12/08/2024 - Changed sound by Andy.
 # Purpose: To output a sound based on the calculated comparison from the msgs subroutine.
 less_celebratory: 
 	addiu $sp, $sp, -8       # Allocate space on the stack
     	sw $ra, 4($sp)           # Save return address to main
     	sw $t0, 0($sp)           # Save temporary register $t0
-	li $a0, 0     # Load piano  
-      	li $v0, 33  
-      	syscall 
+	
+	
+
       	
-      	li $a0, 67    # G4  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
-      	syscall  
-  
-      	li $a0, 69    # A4  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
-      	syscall  
-  
-      	li $a0, 71    # B4  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
-      	syscall  
-  
+      	li $a2, 0     # Load piano  
+      	li $v0, 33  
+      	 
+	
       	li $a0, 72    # C5  
-      	li $v0, 31  
+	li $a1, 250    # 250 milliseconds  
       	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+
+      	li $a0, 72    # C5    
+      	li $a1, 1000    # 1 second  
       	syscall  
-  
-      	li $a0, 74    # D5  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
-      	syscall 
       	 
       	lw $ra, 4($sp)           # Restore return address
     	lw $t0, 0($sp)           # Restore $t0
@@ -212,50 +218,51 @@ less_celebratory:
 # Bad sound 
 # $a0 and $v0 should be available 
 # Contributors: Emma(wrote code but used wrong registers) and Andy(fixed the registers). 12/04/2024
+# 12/08/2024 - Changed sound by Andy.
 # Purpose: To output a sound based on the calculated comparison from the msgs subroutine.
 bad:  
 	addiu $sp, $sp, -8       # Allocate space on the stack
     	sw $ra, 4($sp)           # Save return address to main
     	sw $t0, 0($sp)           # Save temporary register $t0
      
-	li $a0, 0     # Load piano  
+	li $a2, 0     # Load piano  
       	li $v0, 33  
-      	syscall 
+      	 
+	
+      	li $a0, 72    # C5  
+	li $a1, 500    # 500 milliseconds  
+      	syscall  
+
+      	li $a0, 69    # A4    
+      	li $a1, 500    # 500 milliseconds  
+      	syscall  
       	
-      	li $a0, 60    # C4  
-      	li $v0, 31  
+      	      	
+      	li $a0, 72    # C5  
+	li $a1, 500    # 500 milliseconds  
       	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+
+      	li $a0, 69    # A4    
+      	li $a1, 500    # 500 milliseconds  
       	syscall  
-  
-      	li $a0, 62    # D4  
-      	li $v0, 31  
+      	 
+      	li $a0, 72    # C5  
+	li $a1, 500    # 500 milliseconds  
       	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+
+      	li $a0, 69    # A4    
+      	li $a1, 500    # 500 milliseconds  
       	syscall  
-  
-      	li $a0, 64    # E4  
-      	li $v0, 31  
+      	
+      	      	
+      	li $a0, 72    # C5  
+	li $a1, 500    # 500 milliseconds  
       	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
+
+      	li $a0, 69    # A4    
+      	li $a1, 500    # 500 milliseconds  
       	syscall  
-  
-      	li $a0, 65    # F4  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
-      	syscall  
-  
-      	li $a0, 67    # G4  
-      	li $v0, 31  
-      	syscall  
-      	li $a0, 500    # 500 milliseconds  
-      	li $v0, 32  
-      	syscall 
+      	 
       	 
       	lw $ra, 4($sp)           # Restore return address
     	lw $t0, 0($sp)           # Restore $t0
