@@ -393,7 +393,7 @@ main:
        mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
            # Normalize total emissions for weekdays
 	jal normalize_emission_weekday  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 48        # set foourth bar starting x position to x = 48
  	li $a1, 60        # set fourth bar starting x position to x = 60
@@ -439,7 +439,7 @@ main:
     
        # Normalize emissions for calculated weekday energy
 	jal normalize_emission_weekday  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 18        # set second bar starting x position to x = 18
  	li $a1, 30        # set second bar starting x position to x = 30
@@ -453,7 +453,7 @@ main:
     
            # Normalize total emissions for weekdays
 	jal normalize_emission_weekday  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 48        # set foourth bar starting x position to x = 48
  	li $a1, 60        # set fourth bar starting x position to x = 60
@@ -517,7 +517,7 @@ main:
     
            # Normalize total emissions for weekdays
 	jal normalize_emission_weekday  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 48        # set foourth bar starting x position to x = 48
  	li $a1, 60        # set fourth bar starting x position to x = 60
@@ -625,7 +625,7 @@ main:
         mov.d $f0, $f24	# move current value of total in $f24 to $f0 to draw total bar    
            # Normalize total emissions for weekends
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 48        # set foourth bar starting x position to x = 48
  	li $a1, 60        # set fourth bar starting x position to x = 60
@@ -674,7 +674,7 @@ main:
     
       # Normalize emissions for calculated weekend  tranportation
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 18        # set second bar starting x position to x = 18
  	li $a1, 30        # set second bar starting x position to x = 30
@@ -688,7 +688,7 @@ main:
     
            # Normalize total emissions for weekends
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 48        # set foourth bar starting x position to x = 48
  	li $a1, 60        # set fourth bar starting x position to x = 60
@@ -749,7 +749,7 @@ main:
     
            # Normalize total emissions for weekends
 	jal normalize_emission_weekend  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	li $a0, 48        # set fourth bar starting x position to x = 48
  	li $a1, 60        # set fourth bar starting x position to x = 60
@@ -834,7 +834,7 @@ main:
 
         # Normalize total emissions
 	jal normalize_emission_total  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	# Draw user's yearly projected bar
 	li $a0, 2        # set fourth bar starting x position to x = 2
@@ -850,7 +850,7 @@ main:
    
         # Normalize total emissions
 	jal normalize_emission_total  # Normalize the emission value in $f0
-	move $t4, $v0           # Save normalized height in $t3
+	move $t4, $v0           # Save normalized height in $t4
 
 	# draw average American yearly emission
 	li $a0, 33        # set fourth bar starting x position to x = 33
