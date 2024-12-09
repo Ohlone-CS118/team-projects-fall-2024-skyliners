@@ -798,9 +798,10 @@ main:
 	jal drawBar		# draw bar
 	
 	
+	# calculates weekly total result
 	add.d $f0, $f22, $f24	# set weekly total emissions in $f0
 	
-	
+	# Print weekly total result string
 	li $v0, 4
         la $a0, week_total_result	# load week total result string
         syscall
@@ -810,12 +811,12 @@ main:
     	syscall
     
 	
-	
+	# Calculate the yearly projection
 	la $t0, WEEKS_IN_A_YEAR	
     	ldc1 $f20, 0($t0)	# load 52 into f20
     	mul.d $f0, $f20, $f0
     
-    
+    	# print yearly projection result
     	li $v0, 4
         la $a0, yearly_projection_result	# load yearly projection result string
         syscall
@@ -826,6 +827,7 @@ main:
     
 	mov.d $f18, $f12		# Set $f18 to the yearly projection result so that we can preform branching
 	
+	# Print average American result
         li $v0, 4
         la $a0, average_american_result	# load average american string
         syscall
@@ -834,13 +836,15 @@ main:
 	jal normalize_emission_total  # Normalize the emission value in $f0
 	move $t4, $v0           # Save normalized height in $t3
 
+	# Draw user's yearly projected bar
 	li $a0, 2        # set fourth bar starting x position to x = 2
  	li $a1, 30        # set fourth bar starting x position to x = 20
  	move $a2, $t4        # set bar height to normalized height
     	la $a3, BLUE        # set color to blue
     	lw $a3, 0($a3)
 	jal drawBar		# draw bar
-          	
+       
+        # loading average American emission to be normalized   	
     	la $t1, AVERAGE_AMERICAN_EMISSION	
     	ldc1 $f0, 0($t1)	# load 16000 into f0
    
@@ -848,6 +852,7 @@ main:
 	jal normalize_emission_total  # Normalize the emission value in $f0
 	move $t4, $v0           # Save normalized height in $t3
 
+	# draw average American yearly emission
 	li $a0, 33        # set fourth bar starting x position to x = 33
  	li $a1, 61        # set fourth bar starting x position to x = 61
  	move $a2, $t4        # set bar height to normalized height
